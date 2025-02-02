@@ -1,7 +1,7 @@
 import mongoose, { Schema, model } from "mongoose";
 
 const userSchema = new Schema({
-    name: {
+    username: {
         type: String,
         required: [true, 'user name is required']
     },
@@ -28,9 +28,6 @@ const userSchema = new Schema({
         type: String,
         default: "https://cdn-icons-png.flaticon.com/512/149/149071.png"
     },
-    parent: {
-        type: String
-    }
 }, {timestamps: true})
 
 const userModel = model('users', userSchema);

@@ -6,12 +6,12 @@ import jwt from 'jsonwebtoken'
 // Register User
 const registrationController = async (req, res) => {
     try {
-        const { name, email, password, phone } = req.body;
+        const { username, email, password, phone } = req.body;
         console.log(req.body);
         
 
         // validation check
-        if (!name || !email || !password) {
+        if (!username || !email || !password) {
             return res.status(404).send({
                 success: false,
                 message: "All fildes are required"
@@ -32,7 +32,7 @@ const registrationController = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         const newUser = await userModel.create({
-            name,
+            username,
             email,
             password: hashedPassword,
             phone,
