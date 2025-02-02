@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <div>
       {/* Hero Section */}
-      <section className="bg-gray-100 py-16 px-6 text-center" style={{ backgroundImage: 'url("https://img.freepik.com/free-photo/shopping-concept-close-up-portrait-young-beautiful-attractive-redhair-girl-smiling-looking-camera_1258-118763.jpg?t=st=1738217751~exp=1738221351~hmac=5255ce8be8ac16b6eb2ba0401133842d4a6956467158ca7b283aedd5e9aab248&w=1380")' }}>
+      <section className="bg-gray-100 py-16 px-6 text-center" style={{ backgroundImage: 'url("https://img.freepik.com/premium-photo/3d-rendering-online-shopping-chile-social-media-websites_307791-4355.jpg?w=1380")', backgroundSize: "cover" }}>
         <h1 className="text-4xl font-bold">Discover the Best Deals on Top Brands</h1>
         <p className="mt-4 text-gray-600">Shop the latest trends and enjoy fast delivery!</p>
         <button className="mt-6 px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
@@ -14,7 +14,7 @@ export default function Home() {
       </section>
 
       {/* Featured Categories */}
-      <section className="py-12 px-6">
+      {/* <section className="py-12 px-6">
         <h2 className="text-3xl font-bold text-center">Shop by Category</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-6">
           {["Electronics", "Fashion", "Home & Kitchen", "Books"].map((category, index) => (
@@ -26,11 +26,33 @@ export default function Home() {
             </div>
           ))}
         </div>
-      </section>
+      </section> */}
 
       {/* Popular Products */}
       <section className="py-12 px-6 bg-gray-50">
         <h2 className="text-3xl font-bold text-center">Popular Products</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mt-6">
+          {[1, 2, 3, 4].map((product) => (
+            <div key={product} className="bg-white shadow-md p-4 rounded-md hover:shadow-lg">
+              <div className="h-40 bg-gray-300 rounded-md"></div>
+              <h3 className="mt-4 font-semibold">Product Name</h3>
+              <p className="text-gray-500">$99.99</p>
+              <div className="flex items-center mt-2 text-yellow-500">
+                <Star size={16} fill="currentColor" />
+                <Star size={16} fill="currentColor" />
+                <Star size={16} fill="currentColor" />
+                <Star size={16} fill="currentColor" />
+                <Star size={16} fill="none" />
+                <span className="text-gray-500 ml-2">(120 reviews)</span>
+              </div>
+              <button className="mt-4 w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 flex items-center justify-center gap-2">
+                <ShoppingCart size={18} /> Add to Cart
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
+      <section className="py-12 px-6 bg-gray-50">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mt-6">
           {[1, 2, 3, 4].map((product) => (
             <div key={product} className="bg-white shadow-md p-4 rounded-md hover:shadow-lg">

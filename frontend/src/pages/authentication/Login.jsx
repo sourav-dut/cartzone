@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useLoginMutation } from "../../features/api/authApi";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setCredentials } from "../../features/authSlice";
+import { useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify';
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   
   const [login, {isLoading, error}] = useLoginMutation();
 
@@ -24,6 +27,9 @@ export default function Login() {
     const response = await login({email, password}).unwrap();
     console.log(response);
     dispatch(setCredentials(response));
+    toast.success("User logged in");
+    navigate("/");
+    window.location.reload();
 
     // Reset error message on successful form submission
     setErrorMessage("");

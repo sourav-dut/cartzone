@@ -21,16 +21,13 @@ export const authApi = createApi({
       }),
     }),
     register: builder.mutation({
-      query: (userData) => ({
-        url: '/auth/register',
+      query: (registerData) => ({
+        url: '/register',
         method: 'POST',
-        body: userData,
+        body: registerData,
       }),
-    }),
-    getUser: builder.query({
-      query: () => '/auth/user',
     }),
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation, useGetUserQuery } = authApi;
+export const { useLoginMutation, useRegisterMutation } = authApi;

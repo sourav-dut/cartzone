@@ -1,20 +1,36 @@
-import { Link } from "lucide-react";
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
+import { useRegisterMutation } from "../../features/api/authApi";
+import { useSelector, useDispatch } from "react-redux";
+import { setCredentials } from "../../features/authSlice";
+import { useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify';
 
 export default function Signup() {
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState();
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  
+  const [ register, {isLoading, error}] = useRegisterMutation();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Simple validation (you can modify based on your requirements)
-    if (!email || !password) {
+    if (!username || !email || !phone || !password) {
       setErrorMessage("Please fill in both fields.");
       return;
     }
+
+    const response = await register({username, email, phone, password}).unwrap();
+    console.log(response);
+    dispatch(setCredentials(response));
+    toast.success("User created");
+    navigate("/");
 
     // Reset error message on successful form submission
     setErrorMessage("");
@@ -22,6 +38,9 @@ export default function Signup() {
     // Here you can handle login (API call or any other logic)
     console.log("Logging in with:", email, password);
   };
+
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.data?.message || 'Something went wrong'}</p>;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-600">
@@ -50,8 +69,8 @@ export default function Signup() {
                 id="name"
                 className="w-full mt-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
             </div>
 
@@ -67,6 +86,21 @@ export default function Signup() {
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+
+            {/* Phone */}
+            <div className="mb-4">
+              <label htmlFor="phone" className="block text-sm font-semibold text-gray-700">
+                Phone no
+              </label>
+              <input
+                type="tel"
+                id="phone"
+                className="w-full mt-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter your ph no"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
               />
             </div>
 

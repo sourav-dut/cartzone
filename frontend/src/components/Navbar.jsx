@@ -1,10 +1,34 @@
 import { useState, useRef, useEffect } from "react";
 import { ShoppingCart, ChevronDown, User, Menu, X } from "lucide-react";
+import { useGetUserQuery } from "../features/api/userApi";
+import { useDispatch } from "react-redux";
+import { useNavigate } from 'react-router-dom'
+import { logout } from "../features/authSlice";
 
 export default function Navbar() {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const dropdownRef = useRef(null);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  // import authApi
+  const { data: getUser, isLoading, error } = useGetUserQuery();
+  console.log(getUser);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      setIsLoggedIn(true)
+    }
+  }, [])
+
+  // logout user
+  const userLogout = () => {
+    dispatch(logout());
+    window.location.reload();
+  }
 
   const toggleDropdown = (dropdown) => {
     setOpenDropdown(openDropdown === dropdown ? null : dropdown);
@@ -24,6 +48,9 @@ export default function Navbar() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  if (isLoading) return <p>Loading users...</p>;
+  // if (error) return <p>Error fetching users.</p>;
 
   return (
     <>
@@ -110,26 +137,37 @@ export default function Navbar() {
             </div>
 
             {/* Login Dropdown */}
-            <div className="relative">
+            {isLoggedIn ? (
+              <div className="relative">
               <button
                 onClick={() => toggleDropdown("login")}
                 className="flex items-center gap-1"
               >
-                <User size={20} /> <ChevronDown size={16} />
+                <User size={20} /> {getUser.user.name} <ChevronDown size={16} />
               </button>
               {openDropdown === "login" && (
                 <div className="absolute right-0 mt-2 bg-white shadow-md rounded-md p-2 w-40">
                   <ul className="space-y-2">
                     <li className="cursor-pointer hover:text-blue-500">
-                      Sign In
+                      Profile
                     </li>
-                    <li className="cursor-pointer hover:text-blue-500">
-                      Register
+                    <li onClick={userLogout} className="cursor-pointer hover:text-blue-500">
+                      Logout
                     </li>
                   </ul>
                 </div>
               )}
             </div>
+            ) : (
+              <div className="relative">
+              <button 
+                onClick={() => navigate('/login')}
+                className="flex items-center gap-1"
+              >
+                <User size={20} /> Login
+              </button>
+              </div>
+            )}
 
             {/* Cart */}
             <div className="relative cursor-pointer">
@@ -144,9 +182,8 @@ export default function Navbar() {
 
       {/* Mobile Menu - Slide in from Left */}
       <div
-        className={`fixed top-0 left-0 h-full w-64 bg-white shadow-lg p-6 transform ${
-          mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-        } transition-transform duration-300 ease-in-out z-50`}
+        className={`fixed top-0 left-0 h-full w-64 bg-white shadow-lg p-6 transform ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+          } transition-transform duration-300 ease-in-out z-50`}
       >
         {/* Close Button */}
         <button
