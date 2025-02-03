@@ -19,6 +19,10 @@ const userSchema = new Schema({
         type: Number,
         required: [true, "phone number is required"]
     },
+    isVerified:{
+        type:Boolean,
+        default:false
+    },
     userRole: {
         type: String,
         default: "customer",

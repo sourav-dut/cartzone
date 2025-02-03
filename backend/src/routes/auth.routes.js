@@ -1,5 +1,5 @@
 import express from 'express'
-import { loginController, registrationController, sendOtp } from '../controller/auth.controller.js';
+import { frogotPassword, loginController, registrationController, resetPassword, sendOtp, verifyOtp } from '../controller/auth.controller.js';
 import { deleteUserByIdController, getAllUsersController, getUserByIdController, updateUserByIdController } from '../controller/user.controller.js';
 import { authMiddleware } from '../../middleware/auth.middleware.js';
 const router = express.Router();
@@ -8,7 +8,10 @@ const router = express.Router();
 router
     .post("/register", registrationController)
     .post("/login", loginController)
+    .post("/verify-otp", verifyOtp)
     .post("/resend-otp", sendOtp)
+    .post("/forgot-password",frogotPassword)
+    .post("/reset-password",resetPassword)
 
 
 //////////////// User Operation ///////////////////////////
