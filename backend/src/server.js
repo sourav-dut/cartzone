@@ -30,4 +30,4 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/api/v1/user", userRouter);
 
 // listen
-app.listen(PORT, () => console.log(`Server started at ${PORT}`));
+app.listen(PORT, () => console.log(`server [STARTED] ~ http://localhost:${PORT}`));

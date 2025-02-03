@@ -1,12 +1,14 @@
 import express from 'express'
-import { loginController, registrationController } from '../controller/auth.controller.js';
+import { loginController, registrationController, sendOtp } from '../controller/auth.controller.js';
 import { deleteUserByIdController, getAllUsersController, getUserByIdController, updateUserByIdController } from '../controller/user.controller.js';
 import { authMiddleware } from '../../middleware/auth.middleware.js';
 const router = express.Router();
 
 //////////////// User Authentication ///////////////////////////
-router.post("/register", registrationController);
-router.post("/login", loginController);
+router
+    .post("/register", registrationController)
+    .post("/login", loginController)
+    .post("/resend-otp", sendOtp)
 
 
 //////////////// User Operation ///////////////////////////
