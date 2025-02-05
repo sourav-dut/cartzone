@@ -34,10 +34,10 @@ const authMiddleware = async (req, res, next) => {
     }
 };
 
-
+// Admin Middleware
 const adminMiddleware = async (req, res, next) => {
     try {
-        const user = await userModel.findById(req.body.user.id);
+        const user = await userModel.findById(req.body.user._id);
 
         if (!user) {
             return res.status(404).send({
@@ -64,7 +64,38 @@ const adminMiddleware = async (req, res, next) => {
     }
 }
 
+// Vendor Middleware
+const vendorAdminMiddleware = async (req, res, next) => {
+    try {
+        const user = await userModel.findById(req.body.user._id);
+
+        if (!user) {
+            return res.status(404).send({
+                success: false,
+                message: "admin Unauthorized"
+            })
+        };
+
+        if (user.userRole != "admin" || "vendor") {
+            return res.status(404).send({
+                success: false,
+                message: "Only admin or vendor can access"
+            })
+        } else {
+            next();
+        }
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send({
+            success: false,
+            message: "Error in check admin middleware"
+        })
+    }
+}
+
 export {
     authMiddleware,
-    adminMiddleware
+    adminMiddleware,
+    vendorAdminMiddleware
 }

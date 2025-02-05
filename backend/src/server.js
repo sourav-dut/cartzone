@@ -6,7 +6,10 @@ import dotenv from 'dotenv'
 import { dbConnection } from '../config/dbConnection.js';
 
 // files
-import userRouter from './routes/auth.routes.js'
+import userRouter from './routes/auth.routes.js';
+import addressRouter from './routes/address.routes.js'
+import categoryRouter from './routes/category.routes.js';
+import brandRouter from './routes/brand.routes.js';
 
 // dotenv configeration
 dotenv.config();
@@ -28,6 +31,9 @@ app.use(express.urlencoded({ extended: false }));
 
 // endpoint
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/address", addressRouter);
+app.use("/api/v1/category", categoryRouter);
+app.use("/api/v1/brand", brandRouter);
 
 // listen
 app.listen(PORT, () => console.log(`server [STARTED] ~ http://localhost:${PORT}`));

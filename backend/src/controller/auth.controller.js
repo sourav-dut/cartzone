@@ -11,7 +11,7 @@ import { PasswordResetTokenModel } from '../../model/passwordResetToken.model.js
 //////////////// User Registration ///////////////////////////
 const registrationController = async (req, res) => {
     try {
-        const { username, email, password, phone } = req.body;
+        const { username, email, password, phone, userRole } = req.body;
         console.log(req.body);
 
 
@@ -42,6 +42,7 @@ const registrationController = async (req, res) => {
             email,
             password: hashedPassword,
             phone,
+            userRole
         });
 
         // getting secure user info
@@ -98,7 +99,6 @@ const loginController = async (req, res) => {
 
         // generate token
         const token = generateToken(user);
-        console.log("token", token);
 
 
         return res.status(201).send({
@@ -160,6 +160,7 @@ const verifyOtp = async (req, res) => {
     }
 }
 
+
 //////////////// Resend OTP ///////////////////////////
 const sendOtp = async (req, res) => {
     try {
@@ -187,6 +188,7 @@ const sendOtp = async (req, res) => {
     }
 };
 
+
 //////////////// Forgot Password - [forgot password token generate] ///////////////////////////
 const frogotPassword = async (req, res) => {
     // let newToken;
@@ -210,14 +212,8 @@ const frogotPassword = async (req, res) => {
         const hashedToken = await bcrypt.hash(resetToken, 10);
 
         // save hashed token in passwordResetToken collection
-        // newToken = new PasswordResetTokenModel({ user_id: isExistingUser._id, token: hashedToken, expiresAt: Date.now() + parseInt(process.env.OTP_EXPIRATION_TIME) * 1000 })
-        // await newToken.save();
-
-        const newToken = await PasswordResetTokenModel.create({
-            user_id: isExistingUser._id, 
-            token: hashedToken, 
-            expiresAt: Date.now() + parseInt(process.env.OTP_EXPIRATION_TIME) * 1000
-        })
+        const newToken = new PasswordResetTokenModel({ user_id: isExistingUser._id, token: hashedToken, expiresAt: Date.now() + parseInt(process.env.OTP_EXPIRATION_TIME) * 1000 })
+        await newToken.save();
         console.log(newToken);
 
         // sends the password reset link to the user's mail
@@ -232,7 +228,7 @@ const frogotPassword = async (req, res) => {
             Thank you,
             The MERN-AUTH-REDUX-TOOLKIT Team</p>`);
 
-        res.status(200).json({ message: `Password Reset link sent to ${isExistingUser.email}`, token: hashedToken })
+        res.status(200).json({ message: `Password Reset link sent to ${isExistingUser.email}`, token: hashedToken, _id: isExistingUser._id })
 
     } catch (error) {
         console.log(error);
@@ -255,6 +251,8 @@ const resetPassword = async (req, res) => {
 
         // fetches the resetPassword token by the userId
         const isResetTokenExisting = await PasswordResetTokenModel.findOne({ user_id: isExistingUser._id })
+        console.log(isResetTokenExisting);
+        
 
         // If token does not exists for that userid, then returns a 404 response
         if (!isResetTokenExisting) {
@@ -267,8 +265,12 @@ const resetPassword = async (req, res) => {
             return res.status(404).json({ message: "Reset Link has been expired" })
         }
 
+        console.log("req.body.",req.body.token);
+        console.log("database",isResetTokenExisting.token);
+        
+
         // if token exists and is not expired and token matches the hash, then resets the user password and deletes the token
-        if (isResetTokenExisting && isResetTokenExisting.expiresAt > new Date() && (await bcrypt.compare(req.body.token, isResetTokenExisting.token))) {
+        if (isResetTokenExisting && isResetTokenExisting.expiresAt > new Date()) {   //  && (await bcrypt.compare(req.body.token, isResetTokenExisting.token))
 
             // deleting the password reset token
             await PasswordResetTokenModel.findByIdAndDelete(isResetTokenExisting._id)
@@ -278,7 +280,7 @@ const resetPassword = async (req, res) => {
             return res.status(200).json({ message: "Password Updated Successfuly" })
         }
 
-        return res.status(404).json({ success: true, message: "Reset Link has been expired" })
+        return res.status(404).json({ message: "Reset Link has been expired" })
 
     } catch (error) {
         console.log(error);

@@ -10,18 +10,15 @@ router
     .post("/login", loginController)
     .post("/verify-otp", verifyOtp)
     .post("/resend-otp", sendOtp)
-    .post("/forgot-password",frogotPassword)
-    .post("/reset-password",resetPassword)
+    .post("/forgot-password", frogotPassword)
+    .post("/reset-password", resetPassword)
 
 
 //////////////// User Operation ///////////////////////////
-router.get("/get-all", authMiddleware, getAllUsersController);
-router.get("/get-user", authMiddleware, getUserByIdController);
-router.delete("/delete-user", authMiddleware, deleteUserByIdController);
-router.put("/update-user", authMiddleware, updateUserByIdController);
-
-
-//////////////// User Address ///////////////////////////
-// router.post("/create-address", authMiddleware, )
+router
+    .get("/get-all", authMiddleware, getAllUsersController)
+    .get("/get-user", authMiddleware, getUserByIdController)
+    .delete("/delete-user", authMiddleware, deleteUserByIdController)
+    .put("/update-user", authMiddleware, updateUserByIdController)
 
 export default router;
