@@ -76,13 +76,13 @@ const vendorAdminMiddleware = async (req, res, next) => {
             })
         };
 
-        if (user.userRole != "admin" || "vendor") {
+        if (user.userRole === "admin" || "vendor") {
+            next();
+        } else {
             return res.status(404).send({
                 success: false,
                 message: "Only admin or vendor can access"
             })
-        } else {
-            next();
         }
 
     } catch (error) {

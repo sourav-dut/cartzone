@@ -151,7 +151,7 @@ export const createSubSubCategory = async (req, res) => {
         const {sub_sub_category_name, sub_category_id} = req.body;
         if (!sub_sub_category_name) return res.status(404).send({msg: "Please enter the sub_sub_category name"});
 
-        const sub_sub_category = await new SubSubCategoryModel({sub_sub_category_name, category_id, slug: slugify(sub_sub_category_name)}).save();
+        const sub_sub_category = await new SubSubCategoryModel({sub_sub_category_name, sub_category_id, slug: slugify(sub_sub_category_name)}).save();
 
         return res.status(201).json({
             success: true,

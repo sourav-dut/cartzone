@@ -1,15 +1,17 @@
 import { Schema, model } from "mongoose";
 
-const inv_varients_Schema = new Schema({
-    varient_name: {
-        type: String
+const inv_variants_Schema = new Schema({
+    variant_name: {
+        type: String,
+        required: true
     },
     unit: {
         type: String,
         default: null,
     },
     slug: {
-        type: String
+        type: String,
+        unique: true
     },
     data_type: {
         type: String,
@@ -18,19 +20,22 @@ const inv_varients_Schema = new Schema({
     }
 });
 
-export const VarientModel = model("Varient", inv_varients_Schema);
+export const VariantModel = model("Variant", inv_variants_Schema); // Fixed spelling
 
-const inv_varientsOptions_Schema = new Schema({
-    vatient_id: {
+const inv_variantsOptions_Schema = new Schema({
+    variant_id: {
         type: Schema.Types.ObjectId,
-        ref: "Varient"
+        ref: "Variant", // Fixed reference
+        required: true      
     },
-    options_name: {
-        type: String
+    value: {
+        type: String,
+        required: true
     },
     slug: {
-        type: String
+        type: String,
+        unique: true
     },
 });
 
-export const VarientOptionsModel = model("Varient", inv_varientsOptions_Schema);
+export const VariantOptionsModel = model("VariantOption", inv_variantsOptions_Schema); // More meaningful model name
