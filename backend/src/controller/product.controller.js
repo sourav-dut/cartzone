@@ -53,7 +53,7 @@ export const createProduct = async (req, res) => {
 };
 
 // Get All Products
-export const getAll = async (req, res) => {
+export const getAllProduct = async (req, res) => {
     // http://localhost:5000/api/products?brand=Nike&category=Shoes&sort=price&order=asc&page=1&limit=10
     try {
         const filter = {};  // Object to store filter conditions for MongoDB query
@@ -122,7 +122,7 @@ export const getAll = async (req, res) => {
 };
 
 // Get Product by Id
-export const getById=async(req,res)=>{
+export const getProductById=async(req,res)=>{
     try {
         const {id}=req.params
         const result=await productModel.findById(id).populate("brand").populate("category");
@@ -134,7 +134,7 @@ export const getById=async(req,res)=>{
 };
 
 // Update Product by Id
-export const updateById=async(req,res)=>{
+export const updateProductById=async(req,res)=>{
     try {
         const {id}=req.params
         const updated=await productModel.findByIdAndUpdate(id,req.body,{new:true})
@@ -146,7 +146,7 @@ export const updateById=async(req,res)=>{
 }
 
 // Un-delete by Id
-export const undeleteById=async(req,res)=>{
+export const undeleteProductById=async(req,res)=>{
     try {
         const {id}=req.params
         const unDeleted=await productModel.findByIdAndUpdate(id,{isDeleted:false},{new:true}).populate('brand')
@@ -158,7 +158,7 @@ export const undeleteById=async(req,res)=>{
 };
 
 // Delete by Id
-export const deleteById=async(req,res)=>{
+export const deleteProductById=async(req,res)=>{
     try {
         const {id}=req.params
         const deleted=await productModel.findByIdAndUpdate(id,{isDeleted:true},{new:true}).populate("brand")
