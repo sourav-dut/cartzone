@@ -194,6 +194,8 @@ const frogotPassword = async (req, res) => {
     // let newToken;
     try {
         // check if user provided email is exist or not
+        console.log(req.body.email);
+        
         const isExistingUser = await userModel.findOne({ email: req.body.email });
 
         // if email does not exists returns a 404 response
@@ -206,27 +208,34 @@ const frogotPassword = async (req, res) => {
         // if user exist, generates a password reset token
         const resetToken = generateToken(sanitizeUser(isExistingUser), true)
         console.log(resetToken);
-        
+
 
         // hashed the token
         const hashedToken = await bcrypt.hash(resetToken, 10);
 
         // save hashed token in passwordResetToken collection
-        const newToken = new PasswordResetTokenModel({ user_id: isExistingUser._id, token: hashedToken, expiresAt: Date.now() + parseInt(process.env.OTP_EXPIRATION_TIME) * 1000 })
+        const newToken = new PasswordResetTokenModel({ 
+            user_id: isExistingUser._id, 
+            token: hashedToken, 
+            expiresAt: Date.now() + parseInt(process.env.OTP_EXPIRATION_TIME) * 1000 
+        });
+
         await newToken.save();
         console.log(newToken);
 
-        // sends the password reset link to the user's mail
-        await sendMail(isExistingUser.email, 'Password Reset Link for Your MERN-AUTH-REDUX-TOOLKIT Account', `<p>Dear ${isExistingUser.username},
+        // Generate reset Link
+        const resetLink = `http://localhost:${process.env.FRONTEND_URL}/reset-password/${isExistingUser._id}/${resetToken}`;
 
-            We received a request to reset the password for your MERN-AUTH-REDUX-TOOLKIT account. If you initiated this request, please use the following link to reset your password:</p>
-            
-            <p><a href=${process.env.PORT}/reset-password/${isExistingUser._id}/${hashedToken} target="_blank">Reset Password</a></p>
-            
-            <p>This link is valid for a limited time. If you did not request a password reset, please ignore this email. Your account security is important to us.
-            
-            Thank you,
-            The MERN-AUTH-REDUX-TOOLKIT Team</p>`);
+        // sends the password reset link to the user's mail
+        await sendMail(
+            isExistingUser.email,
+            'Password Reset Link for Your MERN-AUTH-REDUX-TOOLKIT Account',
+            `<p>Dear ${isExistingUser.username},</p>
+            <p>We received a request to reset the password for your MERN-AUTH-REDUX-TOOLKIT account. If you initiated this request, please use the following link to reset your password:</p>
+            <p><a href="${resetLink}" target="_blank">Reset Password</a></p>
+            <p>This link is valid for a limited time. If you did not request a password reset, please ignore this email.</p>
+            <p>Thank you,<br>The MERN-AUTH-REDUX-TOOLKIT Team</p>`
+        );
 
         res.status(200).json({ message: `Password Reset link sent to ${isExistingUser.email}`, token: hashedToken, _id: isExistingUser._id })
 
@@ -240,53 +249,45 @@ const frogotPassword = async (req, res) => {
 //////////////// Reset Password ///////////////////////////
 const resetPassword = async (req, res) => {
     try {
-
-        // checks if user exists or not
+        // Check if the user exists
         const isExistingUser = await userModel.findById(req.body.userId);
-
-        // if user does not exists then returns a 404 response
         if (!isExistingUser) {
-            return res.status(404).json({ message: "User does not exists" })
+            return res.status(404).json({ message: "User does not exist" });
         }
 
-        // fetches the resetPassword token by the userId
-        const isResetTokenExisting = await PasswordResetTokenModel.findOne({ user_id: isExistingUser._id })
-        console.log(isResetTokenExisting);
-        
-
-        // If token does not exists for that userid, then returns a 404 response
+        // Fetch the reset password token by userId
+        const isResetTokenExisting = await PasswordResetTokenModel.findOne({ user_id: isExistingUser._id });
         if (!isResetTokenExisting) {
-            return res.status(404).json({ message: "Reset Link is Not Valid" })
+            return res.status(400).json({ message: "Invalid or expired reset link" });
         }
 
-        // if the token has expired then deletes the token, and send response accordingly
+        // Check if the token has expired
         if (isResetTokenExisting.expiresAt < new Date()) {
-            await PasswordResetTokenModel.findByIdAndDelete(isResetTokenExisting._id)
-            return res.status(404).json({ message: "Reset Link has been expired" })
+            await PasswordResetTokenModel.findByIdAndDelete(isResetTokenExisting._id);
+            return res.status(400).json({ message: "Reset link has expired" });
         }
 
-        console.log("req.body.",req.body.token);
-        console.log("database",isResetTokenExisting.token);
-        
-
-        // if token exists and is not expired and token matches the hash, then resets the user password and deletes the token
-        if (isResetTokenExisting && isResetTokenExisting.expiresAt > new Date()) {   //  && (await bcrypt.compare(req.body.token, isResetTokenExisting.token))
-
-            // deleting the password reset token
-            await PasswordResetTokenModel.findByIdAndDelete(isResetTokenExisting._id)
-
-            // resets the password after hashing it
-            await userModel.findByIdAndUpdate(isExistingUser._id, { password: await bcrypt.hash(req.body.new_password, 10) })
-            return res.status(200).json({ message: "Password Updated Successfuly" })
+        // Compare the provided token with the hashed token in DB
+        const isTokenValid = await bcrypt.compare(req.body.token, isResetTokenExisting.token);
+        if (!isTokenValid) {
+            return res.status(400).json({ message: "Invalid reset token" });
         }
 
-        return res.status(404).json({ message: "Reset Link has been expired" })
+        // Reset the user's password
+        isExistingUser.password = await bcrypt.hash(req.body.new_password, 10);
+        await isExistingUser.save();
+
+        // Delete the token after successful password reset
+        await PasswordResetTokenModel.findByIdAndDelete(isResetTokenExisting._id);
+
+        return res.status(200).json({ message: "Password updated successfully" });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Error occured while resetting the password, please try again later" })
+        console.error(error);
+        res.status(500).json({ message: "An error occurred while resetting the password. Please try again later." });
     }
 };
+
 
 export {
     registrationController,

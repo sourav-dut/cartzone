@@ -169,12 +169,12 @@ export const createSubSubCategory = async (req, res) => {
 // Get SubSubCategory
 export const getSubSubCategory = async (req, res) => {
     try {
-        const sub_sub_categories = await SubSubCategoryModel.find({});
-        if (!sub_sub_categories) return res.status(404).json({msg: "Sorry! no categories found"});
+        const categories = await SubSubCategoryModel.find({});
+        if (!categories) return res.status(404).json({msg: "Sorry! no categories found"});
 
         return res.status(201).json({
             success: true,
-            sub_sub_categories
+            categories
         })
     } catch (error) {
         console.log(error);

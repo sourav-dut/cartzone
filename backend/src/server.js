@@ -13,7 +13,10 @@ import brandRouter from './routes/brand.routes.js';
 import variantRouter from './routes/variant.routes.js';
 import productRouter from './routes/product.routes.js';
 import cartRouter from './routes/Cart.routes.js';
-import orderRouter from './routes/Order.routes.js'
+import orderRouter from './routes/Order.routes.js';
+import wishRouter from './routes/Wishlist.routes.js';
+import uploadRouter from './routes/Upload.routes.js'
+
 
 // dotenv configeration
 dotenv.config();
@@ -42,6 +45,8 @@ app.use("/api/v1/variant", variantRouter);
 app.use("/api/v1/product", productRouter);
 app.use("/api/v1/cart", cartRouter);
 app.use("/api/v1/order", orderRouter);
+app.use("/api/v1/order", wishRouter);
+app.use('/api/upload', uploadRouter);
 
 // listen
 app.listen(PORT, () => console.log(`server [STARTED] ~ http://localhost:${PORT}`));

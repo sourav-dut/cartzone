@@ -14,18 +14,18 @@ const productSchema = new Schema({
         required:true
     },
     discountPercentage: {
-        type: Number,
+        type: String,
         default: 0,
     },
     user_id: {
         type: Schema.Types.ObjectId,
         ref: "User"
     },
-    variant_option_id: {
-        type: Schema.Types.ObjectId,
-        ref: "VariantOption",
-        default: null
-    },
+    // variant_option_id: {
+    //     type: Schema.Types.ObjectId,
+    //     ref: "VariantOption",
+    //     default: null
+    // },
     sub_sub_category_id:{
         type:Schema.Types.ObjectId,
         ref:"SubSubCategory",
@@ -45,7 +45,6 @@ const productSchema = new Schema({
     },
     thumbnail:{
         type:String,
-        required:true
     },
     images:{
         type:[String],

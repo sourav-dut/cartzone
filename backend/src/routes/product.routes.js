@@ -5,7 +5,7 @@ const router = express.Router();
 
 router
     .post("/create", authMiddleware, vendorAdminMiddleware, createProduct)
-    .get("/get-all", authMiddleware, getAllProduct)
+    .get("/get-all", getAllProduct)
     .get("/:id", authMiddleware, getProductById)
     .patch("/:id", authMiddleware, vendorAdminMiddleware, updateProductById)
     .patch("/undelete/:id", authMiddleware, vendorAdminMiddleware, undeleteProductById)

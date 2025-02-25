@@ -2,8 +2,13 @@ import { CartModel } from "../../model/Cart.model.js";
 
 export const createCart = async (req, res) => {
     try {
-        const created = await new CartModel(req.body).populate({ path: "product_id", populate: { path: "brand_id" } });
-        await created.save()
+        const { product_id, quantity } = req.body;
+        const created = await new CartModel({
+            user_id: req.body.user._id,
+            product_id,
+            quantity
+        }).populate({ path: "product_id", populate: { path: "brand_id" } });
+        await created.save();
         res.status(201).json(created)
     } catch (error) {
         console.log(error);

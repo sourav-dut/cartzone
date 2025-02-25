@@ -44,6 +44,7 @@ export const updateWishlistById = async (req, res) => {
         res.status(500).json({ message: "Error updating your wishlist, please try again later" })
     }
 }
+
 export const deleteWishlistById = async (req, res) => {
     try {
         const { id } = req.params
