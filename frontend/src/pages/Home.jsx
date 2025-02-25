@@ -1,11 +1,37 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ShoppingCart, Star, Truck, ShieldCheck } from "lucide-react";
+import { useGetAllProductsQuery } from "../features/api/productApi";
+import NotFound from "../components/NotFound";
+import Login from "./authentication/Login";
+import { useNavigate } from "react-router-dom";
+import { useCreateCartMutation } from "../features/api/cartApi";
 
 export default function Home() {
+  const { data: getAllProducts, isLoading, error } = useGetAllProductsQuery();
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log(getAllProducts);
+  }, [getAllProducts]);
+
+  const handelCartData = async () => {
+    
+  }
+
+  if (isLoading) return <p>Loading..........</p>;
+
   return (
     <div>
       {/* Hero Section */}
-      <section className="bg-gray-100 py-16 px-6 text-center" style={{ backgroundImage: 'url("https://img.freepik.com/premium-photo/3d-rendering-online-shopping-chile-social-media-websites_307791-4355.jpg?w=1380")', backgroundSize: "cover" }}>
+      <section
+        className="bg-gray-100 py-16 px-6 text-center"
+        style={{
+          backgroundImage:
+            'url("https://img.freepik.com/premium-photo/3d-rendering-online-shopping-chile-social-media-websites_307791-4355.jpg?w=1380")',
+          backgroundSize: "cover",
+        }}
+      >
         <h1 className="text-4xl font-bold">Discover the Best Deals on Top Brands</h1>
         <p className="mt-4 text-gray-600">Shop the latest trends and enjoy fast delivery!</p>
         <button className="mt-6 px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
@@ -13,61 +39,24 @@ export default function Home() {
         </button>
       </section>
 
-      {/* Featured Categories */}
-      {/* <section className="py-12 px-6">
-        <h2 className="text-3xl font-bold text-center">Shop by Category</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-6">
-          {["Electronics", "Fashion", "Home & Kitchen", "Books"].map((category, index) => (
-            <div
-              key={index}
-              className="bg-amber-400 text-white shadow-md p-6 text-center rounded-md hover:shadow-lg cursor-pointer"
-            >
-              <p className="text-lg font-semibold">{category}</p>
-            </div>
-          ))}
-        </div>
-      </section> */}
-
       {/* Popular Products */}
       <section className="py-12 px-6 bg-gray-50">
         <h2 className="text-3xl font-bold text-center">Popular Products</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mt-6">
-          {[1, 2, 3, 4].map((product) => (
-            <div key={product} className="bg-white shadow-md p-4 rounded-md hover:shadow-lg">
-              <div className="h-40 bg-gray-300 rounded-md"></div>
-              <h3 className="mt-4 font-semibold">Product Name</h3>
-              <p className="text-gray-500">$99.99</p>
+          {getAllProducts?.map((product, index) => (
+            <div key={index} onClick={() => navigate(`/product/${product._id}`)} className="bg-white shadow-md p-4 rounded-md hover:shadow-lg">
+              <div className="h-40 bg-gray-300 rounded-md">
+                <img src={product.images[0]} alt={product.title} sizes="20px"  className="w-full h-full object-cover" />
+              </div>
+              <h3 className="mt-4 font-semibold">{product.title}</h3>
+              <p className="text-gray-500">₹{product.price}</p>
               <div className="flex items-center mt-2 text-yellow-500">
-                <Star size={16} fill="currentColor" />
-                <Star size={16} fill="currentColor" />
-                <Star size={16} fill="currentColor" />
-                <Star size={16} fill="currentColor" />
-                <Star size={16} fill="none" />
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} size={16} fill={i < 4 ? "currentColor" : "none"} />
+                ))}
                 <span className="text-gray-500 ml-2">(120 reviews)</span>
               </div>
-              <button className="mt-4 w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 flex items-center justify-center gap-2">
-                <ShoppingCart size={18} /> Add to Cart
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
-      <section className="py-12 px-6 bg-gray-50">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mt-6">
-          {[1, 2, 3, 4].map((product) => (
-            <div key={product} className="bg-white shadow-md p-4 rounded-md hover:shadow-lg">
-              <div className="h-40 bg-gray-300 rounded-md"></div>
-              <h3 className="mt-4 font-semibold">Product Name</h3>
-              <p className="text-gray-500">$99.99</p>
-              <div className="flex items-center mt-2 text-yellow-500">
-                <Star size={16} fill="currentColor" />
-                <Star size={16} fill="currentColor" />
-                <Star size={16} fill="currentColor" />
-                <Star size={16} fill="currentColor" />
-                <Star size={16} fill="none" />
-                <span className="text-gray-500 ml-2">(120 reviews)</span>
-              </div>
-              <button className="mt-4 w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 flex items-center justify-center gap-2">
+              <button onClick={handelCartData} className="mt-4 w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 flex items-center justify-center gap-2">
                 <ShoppingCart size={18} /> Add to Cart
               </button>
             </div>
