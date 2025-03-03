@@ -93,9 +93,9 @@ const updateUserByIdController = async (req, res) => {
             })
         };
 
-        user.name = name;
-        user.email = email;
-        user.phone = phone;
+        if (name) user.username = name;
+        if (email) user.email = email;
+        if (phone) user.phone = phone;
 
         await user.save();
 

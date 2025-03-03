@@ -3,10 +3,13 @@ import addressModel from "../../model/address.model.js";
 // Create Address
 export const createAddress = async (req, res) => {
     try {
-        const { user_id, street, city, state, phoneNumber, pinCode, country, } = req.body;
+        const { street, city, state, phoneNumber, pinCode, country, } = req.body;
+        console.log(req.body);
+        
+        
 
         // validation check
-        if (!user_id || !street || !city || !state || !phoneNumber || !pinCode || !country) {
+        if (!street || !city || !state || !phoneNumber || !pinCode || !country) {
             return res.status(404).send({
                 success: false,
                 message: "All fildes are required"
@@ -14,7 +17,7 @@ export const createAddress = async (req, res) => {
         };
 
         const address = await addressModel.create({
-            user_id, street, city, state, phoneNumber, pinCode, country
+            user_id: req.body.user._id, street, city, state, phoneNumber, pinCode, country
         });
 
         return res.status(201).send({
@@ -32,11 +35,8 @@ export const createAddress = async (req, res) => {
 export const getByUserId = async (req, res) => {
     try {
         const { id } = req.params
-        const address = await addressModel.findOne({ user_id: id })
-        res.status(200).json({
-            success: true,
-            address
-        })
+        const addresses = await addressModel.find({ user_id: id }).populate({path: "user_id"})
+        res.status(200).json(addresses)
 
     } catch (error) {
         console.log(error);
@@ -75,7 +75,7 @@ export const updateByUserId = async (req, res) => {
 export const deleteByUserId = async (req, res) => {
     try {
         const { id } = req.params;
-        const deletedAddress = await addressModel.findOneAndDelete({user_id: id})
+        const deletedAddress = await addressModel.findByIdAndDelete(id);
         res.status(200).json({
             success: true,
             deletedAddress

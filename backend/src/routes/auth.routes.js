@@ -1,7 +1,7 @@
 import express from 'express'
 import { frogotPassword, loginController, registrationController, resetPassword, sendOtp, verifyOtp } from '../controller/auth.controller.js';
 import { deleteUserByIdController, getAllUsersController, getUserByIdController, updateUserByIdController } from '../controller/user.controller.js';
-import { authMiddleware } from '../../middleware/auth.middleware.js';
+import { adminMiddleware, authMiddleware } from '../../middleware/auth.middleware.js';
 const router = express.Router();
 
 //////////////// User Authentication ///////////////////////////
@@ -16,9 +16,9 @@ router
 
 //////////////// User Operation ///////////////////////////
 router
-    .get("/get-all", authMiddleware, getAllUsersController)
+    .get("/get-all", authMiddleware, adminMiddleware, getAllUsersController)
     .get("/get-user", authMiddleware, getUserByIdController)
     .delete("/delete-user", authMiddleware, deleteUserByIdController)
-    .put("/update-user", authMiddleware, updateUserByIdController)
+    .patch("/update-user", authMiddleware, updateUserByIdController)
 
 export default router;

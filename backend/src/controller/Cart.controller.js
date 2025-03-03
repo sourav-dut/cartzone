@@ -3,12 +3,24 @@ import { CartModel } from "../../model/Cart.model.js";
 export const createCart = async (req, res) => {
     try {
         const { product_id, quantity } = req.body;
+
+        const exisistingCart = await CartModel.findOne({product_id, user_id: req.body.user._id});
+        console.log("cart", exisistingCart);
+        // console.log("user", req.body.user._id);
+        // console.log("user", exisistingCart.user_id.toString());
+        if (exisistingCart && exisistingCart.user_id.toString() === req.body.user._id) {
+            return res.status(404).json({
+                msg: "This item is already added to the cart"
+            })
+        }
+
         const created = await new CartModel({
             user_id: req.body.user._id,
             product_id,
             quantity
         }).populate({ path: "product_id", populate: { path: "brand_id" } });
         await created.save();
+
         res.status(201).json(created)
     } catch (error) {
         console.log(error);
@@ -41,7 +53,7 @@ export const updateCartById = async (req, res) => {
 
 export const deleteCartById = async (req, res) => {
     try {
-        const { id } = req.params
+        const { id } = req.params;
         const deleted = await CartModel.findByIdAndDelete(id)
         res.status(200).json(deleted)
     } catch (error) {
@@ -54,7 +66,7 @@ export const deleteCartByUserId = async (req, res) => {
 
     try {
         const { id } = req.params
-        await CartModel.deleteMany({ user: id })
+        await CartModel.deleteMany({ user_id: id })
         res.sendStatus(204)
     } catch (error) {
         console.log(error);

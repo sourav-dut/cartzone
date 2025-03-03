@@ -35,7 +35,7 @@ export const getAllOrder = async (req, res) => {
         }
 
         const totalDocs = await OrdreModel.find({}).countDocuments().exec()
-        const results = await OrdreModel.find({}).skip(skip).limit(limit).exec()
+        const results = await OrdreModel.find({}).populate("user_id").skip(skip).limit(limit).exec()
 
         res.header("X-Total-Count", totalDocs)
         res.status(200).json(results)
@@ -48,11 +48,41 @@ export const getAllOrder = async (req, res) => {
 
 export const updateOrderById = async (req, res) => {
     try {
-        const { id } = req.params
-        const updatedOrder = await OrdreModel.findByIdAndUpdate(id, req.body, { new: true })
-        res.status(200).json(updatedOrder)
+        // const { id } = req.params
+        const {orderId, updateStatus} =  req.body;
+        console.log(orderId);
+        
+        if (!orderId || !updateStatus) {
+            return res.status(400).json({ message: "Order ID and status are required." });
+        }
+
+        const updatedOrder = await OrdreModel.findByIdAndUpdate(
+            orderId,
+            { status: updateStatus },
+            { new: true }
+        )
+
+        if (!updatedOrder) {
+            return res.status(404).json({ message: "Order not found." });
+        }
+
+        res.status(200).json(updatedOrder);
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Error updating order, please try again later' })
+    }
+}
+
+export const deleteOrder = async (req, res) => {
+    try {
+        const {id} = req.params;
+        const deleteOrder = await OrdreModel.findByIdAndDelete(id);
+
+        return res.status(201).send({
+            deleteOrder
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Error deleting order, please try again later' })
     }
 }

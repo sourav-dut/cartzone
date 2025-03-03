@@ -6,8 +6,8 @@ const router = express.Router();
 router
     .post("/create", authMiddleware, createCart)
     .get("/user/:id", authMiddleware, getCartByUserId)
-    .patch("/:id", authMiddleware, updateCartById)
-    .delete("/:id", authMiddleware, deleteCartById)
+    .patch("/cart/:id", authMiddleware, updateCartById)
+    .delete("/cart/:id", authMiddleware, deleteCartById)
     .delete("/user/:id", authMiddleware, deleteCartByUserId)
 
 export default router;

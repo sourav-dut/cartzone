@@ -162,8 +162,8 @@ export const undeleteProductById = async (req, res) => {
 export const deleteProductById = async (req, res) => {
     try {
         const { id } = req.params
-        const deleted = await productModel.findByIdAndUpdate(id, { isDeleted: true }, { new: true }).populate("brand")
-        res.status(200).json(deleted)
+        const deleted = await productModel.findByIdAndDelete(id, { isDeleted: true }, { new: true }).populate("brand_id")
+        res.status(200).json(deleted)   
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Error deleting product, please try again later' })

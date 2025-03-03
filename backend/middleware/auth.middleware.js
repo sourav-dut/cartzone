@@ -64,7 +64,7 @@ const adminMiddleware = async (req, res, next) => {
     }
 }
 
-// Vendor Middleware
+// Vendor-Admin Middleware
 const vendorAdminMiddleware = async (req, res, next) => {
     try {
         const user = await userModel.findById(req.body.user._id);

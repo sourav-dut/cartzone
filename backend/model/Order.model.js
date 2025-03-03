@@ -12,18 +12,18 @@ const orderSchema = new Schema({
         required: true
     },
     address_id: {
-        type: [Schema.Types.ObjectId],
+        type: Schema.Types.ObjectId,
         ref: "Address",
         required: true
     },
     status: {
         type: String,
-        enum: ['Pending', 'Dispatched', 'Out for delivery', 'Cancelled'],
+        enum: ['Pending', 'Processing', 'Shipped', 'Out for delivery', 'Delivered', 'Cancelled'],
         default: 'Pending'
     },
     paymentMode: {
         type: String,
-        enum: ['COD', 'UPI', 'CARD'],
+        enum: ['COD', 'UPI', 'CARD', 'NET-BANKING'],
         required: true
     },
     total: {

@@ -37,7 +37,7 @@ const registrationController = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         // create user
-        const newUser = await userModel.create({
+        const user = await userModel.create({
             username,
             email,
             password: hashedPassword,
@@ -46,7 +46,7 @@ const registrationController = async (req, res) => {
         });
 
         // getting secure user info
-        const secureInfo = sanitizeUser(newUser);
+        const secureInfo = sanitizeUser(user);
 
         // generate token
         const token = generateToken(secureInfo);
@@ -54,7 +54,7 @@ const registrationController = async (req, res) => {
         return res.status(201).send({
             success: true,
             message: "User created successfully",
-            secureInfo,
+            user,
             token: token
         })
 
@@ -165,6 +165,8 @@ const verifyOtp = async (req, res) => {
 const sendOtp = async (req, res) => {
     try {
         const existingUser = await userModel.findById(req.body.userId)
+        console.log(req.body.userId);
+        
 
         if (!existingUser) {
             return res.status(404).json({ "message": "User not found" })

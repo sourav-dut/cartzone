@@ -45,7 +45,7 @@ app.use("/api/v1/variant", variantRouter);
 app.use("/api/v1/product", productRouter);
 app.use("/api/v1/cart", cartRouter);
 app.use("/api/v1/order", orderRouter);
-app.use("/api/v1/order", wishRouter);
+app.use("/api/v1/wish", wishRouter);
 app.use('/api/upload', uploadRouter);
 
 // listen
