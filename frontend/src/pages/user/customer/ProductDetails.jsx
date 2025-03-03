@@ -9,8 +9,11 @@ import { useNavigate } from "react-router-dom";
 export default function ProductDetails() {
   const [selectedImage, setSelectedImage] = useState(null);
   const { productId } = useParams();
-  const { data: product, isLoading, error } = useGetProductByIdQuery(productId);
-  console.log(product);
+  
+  const { data: product, isLoading, error, refetch } = useGetProductByIdQuery(productId);
+  
+    console.log("product", product);
+
   const navigate = useNavigate();
   
   const [createCart, { isLoading: cartIsLoading, error: cartError }] = useCreateCartMutation();
@@ -20,13 +23,15 @@ export default function ProductDetails() {
     quantity: 1
   }
   
-
+  const { _id } = JSON.parse(localStorage.getItem("user") || "{}");
+  
   const handleCart = async () => {
     try {
       const response = await createCart(cartData).unwrap();
       console.log(response);
       toast.success("Added to cart successfully");
-      navigate("/cart")
+      navigate(`/cart/${_id}`);
+      refetch();
     } catch (error) {
       console.log(error);
       toast.error("Somthing wrong!!");

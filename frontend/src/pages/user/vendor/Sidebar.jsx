@@ -6,7 +6,7 @@ const Sidebar = () => {
   
   const menuItems = [
     { name: "Dashboard", path: "/vendor", icon: <FiHome /> },
-    { name: "Orders", path: "/orders", icon: <FiShoppingCart /> },
+    { name: "Orders", path: "/vendor/orders", icon: <FiShoppingCart /> },
     { name: "Products", path: "/vendor/products", icon: <FiBox /> },
     { name: "Customers", path: "/customers", icon: <FiUsers /> },
   ];

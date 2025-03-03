@@ -8,6 +8,8 @@ import { categoryApi } from '../features/api/categoryApi';
 import { cloudApi } from '../features/api/cloudApi';
 import { brandApi } from '../features/api/barndsApi';
 import { cartApi } from '../features/api/cartApi';
+import { addressApi } from '../features/api/addressApi';
+import { orderApi } from '../features/api/orderApi';
 
 export const store = configureStore({
   reducer: {
@@ -20,6 +22,8 @@ export const store = configureStore({
     [cloudApi.reducerPath]: cloudApi.reducer,
     [brandApi.reducerPath]: brandApi.reducer,
     [cartApi.reducerPath]: cartApi.reducer,
+    [addressApi.reducerPath]: addressApi.reducer,
+    [orderApi.reducerPath]: orderApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
@@ -30,4 +34,6 @@ export const store = configureStore({
       .concat(cloudApi.middleware)
       .concat(brandApi.middleware)
       .concat(cartApi.middleware)
+      .concat(addressApi.middleware)
+      .concat(orderApi.middleware)
 });

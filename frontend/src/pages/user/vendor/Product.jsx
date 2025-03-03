@@ -1,15 +1,15 @@
 import { useState } from "react";
-import { useGetAllSubSubCategoryQuery } from "../features/api/categoryApi";
-import NotFound from "./NotFound";
-import { useGetAllBrandQuery } from "../features/api/barndsApi";
-import { useCreateProductMutation, useGetAllProductsQuery } from "../features/api/productApi";
+import { useGetAllSubSubCategoryQuery } from "../../../features/api/categoryApi";
+import NotFound from "../../../components/NotFound";
+import { useGetAllBrandQuery } from "../../../features/api/barndsApi";
+import { useCreateProductMutation, useGetAllProductsQuery } from "../../../features/api/productApi";
 import { toast } from 'react-toastify';
-import { useUploadImagesMutation } from "../features/api/cloudApi";
+import { useUploadImagesMutation } from "../../../features/api/cloudApi";
 
 export default function Product() {
     const { data: sub_categories, isLoading: isCategoryLoading, error } = useGetAllSubSubCategoryQuery();
     const { data: getAllBrand, isLoading: isBrandLoading, error: brandError } = useGetAllBrandQuery();
-    const { data: getAllProducts, isLoading: productLoading } = useGetAllProductsQuery();
+    const { data: getAllProducts, isLoading: productLoading, error: productError, refetch } = useGetAllProductsQuery();
     const [createProduct] = useCreateProductMutation();
     const [uploadImages, { isLoading: imageIsLoading }] = useUploadImagesMutation();
 
@@ -121,12 +121,13 @@ export default function Product() {
                 brand_id: "",
                 images: [],
             });
+            refetch();
         } catch (error) {
             console.error("Upload Error:", error);
             toast.error("Failed to add product.");
         }
     };    
-
+    
 
     return (
         <div className="p-6">
@@ -304,6 +305,7 @@ export default function Product() {
                                             <td className="p-2">{product.title}</td>
                                             <td className="p-2">₹{product.price}</td>
                                             <td className="p-2">{product.sub_sub_category_id.sub_sub_category_name}</td>
+                                            <td className="text-red-500 cursor-pointer">Delete</td>
                                         </tr>
                                     ))}
                                 </tbody>

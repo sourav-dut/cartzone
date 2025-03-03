@@ -17,14 +17,21 @@ export const userApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    getUsers: builder.query({
-      query: () => 'users',
+    getAllUsers: builder.query({
+      query: () => '/get-all',
     }),
     getUser: builder.query({
       query: () => '/get-user',
+    }),
+    updateUser: builder.mutation({
+      query: (formData) => ({
+        url: '/update-user',
+        method: "PATCH",
+        body: formData
+      })
     }),
   }),
 });
 
 // Auto-generated hooks for the endpoints
-export const { useGetUsersQuery, useGetUserQuery } = userApi;
+export const { useGetAllUsersQuery, useGetUserQuery, useUpdateUserMutation } = userApi;

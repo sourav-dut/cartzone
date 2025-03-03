@@ -34,7 +34,7 @@ export default function Login() {
       navigate("/");
       window.location.reload();
     } else {
-      toast.error("Somthing Wrong!@")
+      toast.error("Somthing Wrong!@");
     }
 
     // Reset error message on successful form submission

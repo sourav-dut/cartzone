@@ -31,6 +31,7 @@ export default function Signup() {
     dispatch(setCredentials(response));
     toast.success("User created");
     navigate("/");
+    window.location.reload();  // Refresh the entire page
 
     // Reset error message on successful form submission
     setErrorMessage("");

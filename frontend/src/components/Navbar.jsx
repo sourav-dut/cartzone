@@ -5,6 +5,8 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from 'react-router-dom'
 import { logout } from "../features/authSlice";
 import { skipToken } from "@reduxjs/toolkit/query";
+import { useGetCartQuery } from "../features/api/cartApi";
+import { useSearchProductsQuery } from "../features/api/productApi";
 
 export default function Navbar() {
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -13,6 +15,11 @@ export default function Navbar() {
   const dropdownRef = useRef(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  // Search Product
+  const [query, setQuery] = useState("");
+  const { data: products, isLoading: productIsLoading, error: productIsError } = useSearchProductsQuery(query, { skip: query.length < 3 });
+  if (!productIsLoading) console.log("Products", products);
 
 
   const token = localStorage.getItem("token");
@@ -24,11 +31,16 @@ export default function Navbar() {
     }
   }, []);
 
+  const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+  
+
   // import authApi
   // If someCondition is true, the query will receive skipToken, preventing the API call.
   // If someCondition is false, it will proceed with fetching the data.
   const { data: getUser, isLoading, error } = useGetUserQuery(!token ? skipToken : undefined);
-  // console.log(getUser);
+  const { data: getCart, isLoading: cartIsLoading, error: cartError, refetch } = useGetCartQuery(storedUser._id);
+  if (!isLoading)
+    console.log("cart",getCart);
 
   // logout user
   const userLogout = () => {
@@ -53,6 +65,7 @@ export default function Navbar() {
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+    refetch();
   }, []);
 
   if (isLoading) return <p>Loading users...</p>;
@@ -83,6 +96,8 @@ export default function Navbar() {
             <input
               type="text"
               placeholder="Search products..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
               className="w-full px-2 py-1 outline-none"
             />
             <button className="px-4 bg-blue-500 text-white">Search</button>
@@ -154,8 +169,14 @@ export default function Navbar() {
                 {openDropdown === "login" && (
                   <div className="absolute right-0 mt-2 bg-white shadow-md rounded-md p-2 w-40">
                     <ul className="space-y-2">
-                      <li className="cursor-pointer hover:text-blue-500">
+                      <li onClick={() => navigate("/profile")} className="cursor-pointer hover:text-blue-500">
                         Profile
+                      </li>
+                      <li onClick={() => navigate(`/address/${getUser?.user?._id}`)} className="cursor-pointer hover:text-blue-500">
+                        Address [Location]
+                      </li>
+                      <li onClick={() => navigate(`/order`)} className="cursor-pointer hover:text-blue-500">
+                        Orders
                       </li>
                       <li onClick={userLogout} className="cursor-pointer hover:text-blue-500">
                         Logout
@@ -176,10 +197,10 @@ export default function Navbar() {
             )}
 
             {/* Cart */}
-            <div className="relative cursor-pointer">
+            <div onClick={() => navigate(`/cart/${getUser?.user?._id}`)} className="relative cursor-pointer">
               <ShoppingCart size={24} />
               <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs px-1 rounded-full">
-                2
+              {getCart?.length}
               </span>
             </div>
           </div>
@@ -248,7 +269,7 @@ export default function Navbar() {
           {/* Cart */}
           <div className="relative cursor-pointer">
             <ShoppingCart size={24} />
-            <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs px-1 rounded-full">2</span>
+            <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs px-1 rounded-full">{getCart?.length}</span>
           </div>
         </div>
       </div>

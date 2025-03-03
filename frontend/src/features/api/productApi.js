@@ -30,9 +30,18 @@ export const productApi = createApi({
         method: 'POST',
         body: productData,
       })
-    })
+    }),
+    deleteProduct: builder.mutation({
+      query: (id) => ({
+        url: `/delete/${id}`,
+        method: "DELETE"
+      })
+    }),
+    searchProducts: builder.query({
+      query: (keyword) => `/search?keyword=${keyword}`,
+  }),
   }),
 });
 
 // Auto-generated hooks for the endpoints
-export const { useGetAllProductsQuery, useGetProductByIdQuery, useCreateProductMutation } = productApi;
+export const { useGetAllProductsQuery, useGetProductByIdQuery, useCreateProductMutation, useDeleteProductMutation, useSearchProductsQuery } = productApi;

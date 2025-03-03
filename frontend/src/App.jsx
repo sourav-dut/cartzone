@@ -5,12 +5,20 @@ import Home from './pages/Home'
 import Login from './pages/authentication/Login'
 import Signup from './pages/authentication/Signup'
 import Profile from './pages/user/Profile'
-import Dashboard from './pages/admin/Dashboard'
-import DashContent from './pages/admin/DashContent'
-import Product from './components/Product'
+import Dashboard from './pages/user/vendor/Dashboard'
+import DashContent from './pages/user/vendor/DashContent'
+import Product from './pages/user/vendor/Product'
 import ProductDetails from './pages/user/customer/ProductDetails'
 import ResetPassword from './pages/authentication/ResetPassword'
 import Cart from './pages/user/customer/Cart'
+import AdminDashboard from './pages/admin/AdminDashboard'
+import AdminDashContent from './pages/admin/AdminDashContent'
+import AdminProduct from './pages/admin/AdminProduct'
+import Address from './pages/user/Address'
+import CheckoutPage from './pages/user/customer/CheckoutPage'
+import OrderPage from './pages/admin/OrderPage'
+import CustomerOrders from './pages/user/customer/CustomerOrders'
+import Coustomers from './pages/admin/Coustomers'
 
 export const router = createBrowserRouter([
   {
@@ -30,10 +38,6 @@ export const router = createBrowserRouter([
         element: <ResetPassword />
       },
       {
-        path: "/cart",
-        element: <Cart />
-      },
-      {
         path: "signup",
         element: <Signup />
       },
@@ -42,9 +46,26 @@ export const router = createBrowserRouter([
         element: <Profile />
       },
       {
+        path: "/address/:userId",
+        element: <Address />
+      },
+      {
         path: '/product/:productId',
         element: <ProductDetails />
       },
+      {
+        path: "/cart/:userId",
+        element: <Cart />
+      },
+      {
+        path: "/checkout/:userId",
+        element: <CheckoutPage />
+      },
+      {
+        path: "/order",
+        element: <CustomerOrders />
+      },
+      // VENDOR
       {
         path: "/vendor",
         element: <Dashboard />,
@@ -59,17 +80,26 @@ export const router = createBrowserRouter([
           },
         ]
       },
+      // ADMIN
       {
         path: "/admin",
-        element: <Dashboard />,
+        element: < AdminDashboard/>,
         children: [
           {
             path: "",
-            element: <DashContent />
+            element: <AdminDashContent />
           },
           {
-            path: "products",
-            element: <Product />
+            path: "product",
+            element: <AdminProduct />
+          },
+          {
+            path: "orders",
+            element: <OrderPage />
+          },
+          {
+            path: "all-users",
+            element: <Coustomers />
           },
         ]
       }
