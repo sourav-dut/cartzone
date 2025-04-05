@@ -1,6 +1,8 @@
 import React, {useState} from "react";
 import { format } from "date-fns";
 import { useGetOrderQuery, useUpdateOrderMutation } from "../../features/api/orderApi";
+import LoadingPage from "../../components/LoadingPage";
+import ErrorPage from "../../components/ErrorPage";
 
 const OrderPage = () => {
   const { data: orders, isLoading, error, refetch } = useGetOrderQuery();
@@ -22,8 +24,8 @@ const OrderPage = () => {
     }
   };
 
-  if (isLoading) return <p className="text-center mt-10">Loading...</p>;
-  if (error) return <p className="text-center text-red-500">Error loading orders</p>;
+  if (isLoading) return <LoadingPage />;
+  if (error) return <ErrorPage />;
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white shadow-lg rounded-lg">

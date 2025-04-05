@@ -6,6 +6,9 @@ const authSlice = createSlice({
     user: null,
     token: localStorage.getItem('token') || null,
     isLoggedIn: false,
+    isMainCategory: false,
+    mainCategoryId: null,
+    mainCategoryName: null
   },
   reducers: {
     setCredentials: (state, action) => {
@@ -21,8 +24,13 @@ const authSlice = createSlice({
       localStorage.removeItem('token');
       localStorage.removeItem('user');
     },
+    setCategory: (state, action) => {
+      state.isMainCategory = action.payload.isMainCategory;
+      state.mainCategoryId = action.payload.id;
+      state.mainCategoryName = action.payload.name;
+    },
   },
 });
 
-export const { setCredentials, logout } = authSlice.actions;
+export const { setCredentials, logout, setCategory } = authSlice.actions;
 export default authSlice.reducer;

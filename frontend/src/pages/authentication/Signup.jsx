@@ -5,6 +5,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { setCredentials } from "../../features/authSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
+import LoadingPage from "../../components/LoadingPage";
+import ErrorPage from "../../components/ErrorPage";
 
 export default function Signup() {
   const [username, setUsername] = useState("");
@@ -40,8 +42,8 @@ export default function Signup() {
     console.log("Logging in with:", email, password);
   };
 
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.data?.message || 'Something went wrong'}</p>;
+  if (isLoading) return <LoadingPage />;
+  if (error) return <ErrorPage />;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-600">

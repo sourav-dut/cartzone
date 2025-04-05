@@ -1,12 +1,15 @@
 import { useState, useRef, useEffect } from "react";
-import { ShoppingCart, ChevronDown, User, Menu, X } from "lucide-react";
+import { ShoppingCart, ChevronDown, User, Menu, X, ShoppingBag } from "lucide-react";
 import { useGetUserQuery } from "../features/api/userApi";
 import { useDispatch } from "react-redux";
 import { useNavigate } from 'react-router-dom'
-import { logout } from "../features/authSlice";
+import { logout, setCategory } from "../features/authSlice";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useGetCartQuery } from "../features/api/cartApi";
-import { useSearchProductsQuery } from "../features/api/productApi";
+import { useGetAllCategoryQuery } from "../features/api/categoryApi";
+import LoadingPage from "./LoadingPage";
+import { motion } from "framer-motion";
+import { useGetAllProductsQuery, useSearchSuggestionQuery } from "../features/api/productApi";
 
 export default function Navbar() {
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -15,13 +18,13 @@ export default function Navbar() {
   const dropdownRef = useRef(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
 
   // Search Product
-  const [query, setQuery] = useState("");
-  const { data: products, isLoading: productIsLoading, error: productIsError } = useSearchProductsQuery(query, { skip: query.length < 3 });
-  if (!productIsLoading) console.log("Products", products);
+  const [search, setSearch] = useState(null);
+  const [suggestions, setSuggestions] = useState([]);
 
-
+  // Check the isLoggedIn and set IsLoggedIn
   const token = localStorage.getItem("token");
   useEffect(() => {
     if (token) {
@@ -31,16 +34,16 @@ export default function Navbar() {
     }
   }, []);
 
-  const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
-  
 
   // import authApi
   // If someCondition is true, the query will receive skipToken, preventing the API call.
   // If someCondition is false, it will proceed with fetching the data.
-  const { data: getUser, isLoading, error } = useGetUserQuery(!token ? skipToken : undefined);
-  const { data: getCart, isLoading: cartIsLoading, error: cartError, refetch } = useGetCartQuery(storedUser._id);
-  if (!isLoading)
-    console.log("cart",getCart);
+  const { data: getUser, isLoading, error, refetch } = useGetUserQuery(!token ? skipToken : undefined);
+  console.log("getUser", getUser);
+
+  const { data: getCart, isLoading: cartIsLoading, error: cartError } = useGetCartQuery(storedUser._id);
+  const { data: allCategory, isLoading: categoryIsLoading, error: cateError } = useGetAllCategoryQuery();
+  // const { data: searchSuggestions } = useSearchSuggestionQuery(search);
 
   // logout user
   const userLogout = () => {
@@ -65,10 +68,9 @@ export default function Navbar() {
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-    refetch();
   }, []);
 
-  if (isLoading) return <p>Loading users...</p>;
+  if (isLoading || categoryIsLoading) return <LoadingPage />;
   // if (error) return <p>Error fetching users.</p>;
 
   return (
@@ -81,7 +83,7 @@ export default function Navbar() {
         ></div>
       )}
 
-      <nav className="bg-white shadow-md p-4">
+      <nav className="bg-white shadow-md p-4 fixed top-0 left-0 w-full z-50">
         <div className="flex justify-between items-center">
           {/* Mobile Menu Button */}
           <button onClick={toggleMobileMenu} className="md:hidden">
@@ -89,19 +91,72 @@ export default function Navbar() {
           </button>
 
           {/* Logo */}
-          <div className="text-2xl font-bold">E-Shop</div>
+          <motion.div
+            className="flex items-center cursor-pointer space-x-1"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            onClick={() => navigate('/')}
+          >
+            <motion.div
+              initial={{ rotate: -10 }}
+              animate={{ rotate: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <ShoppingBag className="text-cyan-900" size={25} />
+            </motion.div>
+            <motion.div
+              className="text-2xl font-semibold text-cyan-900 tracking-tight font-[]"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
+              Cart<span className="text-cyan-600">zone</span>
+            </motion.div>
+          </motion.div>
 
-          {/* Search Bar (Hidden on Mobile) */}
+          {/* Search Bar */}
           <div className="hidden md:flex items-center border rounded-md overflow-hidden w-1/3">
             <input
               type="text"
               placeholder="Search products..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              value={search || ""} // Ensure value is always a string
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  navigate(`/products?search=${search}`);
+                  setSearch(""); // Clear the search input after navigation
+                }
+              }}
               className="w-full px-2 py-1 outline-none"
             />
-            <button className="px-4 bg-blue-500 text-white">Search</button>
+
+            <button onClick={() => {
+              navigate(`/products?search=${search}`);
+              setSearch(""); // Set to empty string instead of null
+            }} className="px-4 bg-blue-500 text-white">
+              Search
+            </button>
+
           </div>
+
+          {/* Suggestions Dropdown */}
+          {/* {searchSuggestions && searchSuggestions.length > 0 && (
+            <ul className="absolute bg-white shadow-lg rounded-md mt-1 w-full z-50">
+              {searchSuggestions.map((s, index) => (
+                <li
+                  key={index}
+                  className="cursor-pointer p-2 hover:bg-gray-100"
+                  onClick={() => {
+                    navigate(`/products?search=${s.title}`);
+                    setSearch("");
+                  }}
+                >
+                  {s.title}
+                </li>
+              ))}
+            </ul>
+          )} */}
 
           {/* Desktop Navigation */}
           <div
@@ -113,45 +168,36 @@ export default function Navbar() {
               <button
                 onClick={() => toggleDropdown("category")}
                 className="flex items-center gap-1"
+                aria-expanded={openDropdown === "category"}
               >
                 Categories <ChevronDown size={16} />
               </button>
-              {openDropdown === "category" && (
-                <div className="absolute left-0 mt-2 bg-white shadow-md rounded-md p-2 w-40">
-                  <ul className="space-y-2">
-                    <li className="cursor-pointer hover:text-blue-500">
-                      Electronics
-                    </li>
-                    <li className="cursor-pointer hover:text-blue-500">
-                      Fashion
-                    </li>
-                    <li className="cursor-pointer hover:text-blue-500">
-                      Home & Kitchen
-                    </li>
-                    <li className="cursor-pointer hover:text-blue-500">Books</li>
-                  </ul>
-                </div>
-              )}
-            </div>
 
-            {/* More Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => toggleDropdown("more")}
-                className="flex items-center gap-1"
-              >
-                More <ChevronDown size={16} />
-              </button>
-              {openDropdown === "more" && (
-                <div className="absolute left-0 mt-2 bg-white shadow-md rounded-md p-2 w-40">
+              {openDropdown === "category" && (
+                <div
+                  className="absolute left-0 mt-2 bg-white shadow-md rounded-md p-2 w-40 z-50"
+                  role="menu"
+                >
                   <ul className="space-y-2">
-                    <li className="cursor-pointer hover:text-blue-500">Offers</li>
-                    <li className="cursor-pointer hover:text-blue-500">
-                      Customer Support
-                    </li>
-                    <li className="cursor-pointer hover:text-blue-500">
-                      Gift Cards
-                    </li>
+                    {allCategory?.categories?.length > 0 ? (
+                      allCategory.categories.filter((category) => category.parent_id == null).map((category, index) => (
+                        <li
+                          key={index}
+                          className="cursor-pointer hover:text-blue-500"
+                          onClick={() => {
+                            dispatch(setCategory({ isMainCategory: true, id: category._id, name: category.name }));
+                            setOpenDropdown(null);
+                            navigate("/products")
+                          }}
+                        // role="menuitem"
+                        >
+                          {category.name}
+                        </li>
+                      ))
+                    ) : (
+                      <li className="text-gray-400">No categories available</li>
+                    )}
+                    <li className="cursor-pointer hover:text-blue-500" onClick={() => dispatch(setCategory({ isMainCategory: false, id: null, name: null }))}>Main Category</li>
                   </ul>
                 </div>
               )}
@@ -164,18 +210,27 @@ export default function Navbar() {
                   onClick={() => toggleDropdown("login")}
                   className="flex items-center gap-1"
                 >
-                  <User size={20} /> {getUser?.user?.username || "User"} <ChevronDown size={16} />
+                  <User size={20} /> {getUser?.user?.username || setIsLoggedIn(false)} <ChevronDown size={16} />
                 </button>
                 {openDropdown === "login" && (
                   <div className="absolute right-0 mt-2 bg-white shadow-md rounded-md p-2 w-40">
                     <ul className="space-y-2">
-                      <li onClick={() => navigate("/profile")} className="cursor-pointer hover:text-blue-500">
+                      <li onClick={() => {
+                        setOpenDropdown(null)
+                        navigate("/profile");
+                      }} className="cursor-pointer hover:text-blue-500">
                         Profile
                       </li>
-                      <li onClick={() => navigate(`/address/${getUser?.user?._id}`)} className="cursor-pointer hover:text-blue-500">
+                      <li onClick={() => {
+                        setOpenDropdown(null)
+                        navigate(`/address/${getUser?.user?._id}`);
+                      }} className="cursor-pointer hover:text-blue-500">
                         Address [Location]
                       </li>
-                      <li onClick={() => navigate(`/order`)} className="cursor-pointer hover:text-blue-500">
+                      <li onClick={() => {
+                        setOpenDropdown(null)
+                        navigate(`/order`)
+                      }} className="cursor-pointer hover:text-blue-500">
                         Orders
                       </li>
                       <li onClick={userLogout} className="cursor-pointer hover:text-blue-500">
@@ -200,7 +255,7 @@ export default function Navbar() {
             <div onClick={() => navigate(`/cart/${getUser?.user?._id}`)} className="relative cursor-pointer">
               <ShoppingCart size={24} />
               <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs px-1 rounded-full">
-              {getCart?.length}
+                {getCart?.length}
               </span>
             </div>
           </div>

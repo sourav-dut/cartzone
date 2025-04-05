@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useCreateAddressMutation, useDeleteAddressMutation, useGetAddressQuery } from '../../features/api/addressApi';
 import { useParams } from 'react-router-dom';
+import LoadingPage from '../../components/LoadingPage';
 
 const Address = () => {
     const { userId } = useParams();
@@ -27,15 +28,15 @@ const Address = () => {
         refetch();
     };
 
-    if (isLoading) return <p>Loading addresses...</p>;
-    if (error) return <p>Error fetching addresses</p>;
+    if (isLoading) return <LoadingPage />;
+    if (error) return <Error />;
 
     return (
-        <div className="p-6">
+        <div className="p-6 pt-20">
             <h1 className="text-2xl font-bold mb-4">Saved Addresses</h1>
             <form onSubmit={handleAdd} className="mb-6 p-4 border rounded-md shadow-md">
                 <h2 className="text-lg font-semibold mb-2">Add New Address</h2>
-                <input type="text" placeholder="Phone" value={newAddress.phoneNumber} onChange={(e) => setNewAddress({ ...newAddress, phoneNumber: e.target.value })} className="block w-full mb-2 p-2 border rounded" required />
+                <input type="tel" placeholder="Phone" value={newAddress.phoneNumber} onChange={(e) => setNewAddress({ ...newAddress, phoneNumber: e.target.value })} className="block w-full mb-2 p-2 border rounded" required />
                 <input type="text" placeholder="street" value={newAddress.street} onChange={(e) => setNewAddress({ ...newAddress, street: e.target.value })} className="block w-full mb-2 p-2 border rounded" required />
                 <input type="text" placeholder="City" value={newAddress.city} onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })} className="block w-full mb-2 p-2 border rounded" required />
                 <input type="text" placeholder="State" value={newAddress.state} onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })} className="block w-full mb-2 p-2 border rounded" required />

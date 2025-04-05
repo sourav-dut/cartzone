@@ -4,7 +4,7 @@ import Sidebar from './Sidebar'
 
 const Dashboard = () => {
   return (
-    <div className='flex'>
+    <div className='flex pt-16'>
         <Sidebar />
         <div className='ml-16'>
           <Outlet />

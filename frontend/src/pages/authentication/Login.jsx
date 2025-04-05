@@ -5,6 +5,8 @@ import { useDispatch } from "react-redux";
 import { setCredentials } from "../../features/authSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
+import LoadingPage from "../../components/LoadingPage";
+import ErrorPage from "../../components/ErrorPage";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -55,8 +57,8 @@ export default function Login() {
     }
   }
 
-  if (isLoading) return <p>Loading...</p>;
-  // if (error) return <p>Error: {error.data?.message || 'Something went wrong'}</p>;
+  if (isLoading || isPasswordLoading) return <LoadingPage />;
+  if (error) return <ErrorPage />;
 
 
   return (

@@ -4,6 +4,8 @@ import { removeFromCart } from "../../../features/cartSlice";
 import { useDeleteCartMutation, useGetCartQuery } from "../../../features/api/cartApi";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import LoadingPage from "../../../components/LoadingPage";
+import ErrorPage from "../../../components/ErrorPage";
 
 export default function Cart() {
   const dispatch = useDispatch();
@@ -16,12 +18,22 @@ export default function Cart() {
   useEffect(() => {
     refetch();
   }, [])
-  
+
   const [deleteCartItem] = useDeleteCartMutation();
 
-  const handleRemove = async (cartId) => {
+  const handleRemove = async (cartId, productId) => {
     try {
       await deleteCartItem(cartId).unwrap();
+      
+      // Remove the product's discount from localStorage
+      let discountData = JSON.parse(localStorage.getItem("productDiscount")) || [];
+  
+      // Filter out the discount entry related to the removed product
+      discountData = discountData.filter(discount => discount.productId !== productId);
+  
+      // Save the updated discount data back to localStorage
+      localStorage.setItem("productDiscount", JSON.stringify(discountData));
+  
       toast.info("Item removed from cart");
       refetch();
     } catch (error) {
@@ -29,17 +41,25 @@ export default function Cart() {
     }
   };
   
+
   const handelPlaceOrder = () => {
     navigate(`/checkout/${userId}`);
-  }
+  };
 
-  if (isLoading) return <p className="text-center mt-10">Loading...</p>;
-  if (error) return <p className="text-center mt-10 text-red-500">Error loading cart</p>;
+  let discountData = JSON.parse(localStorage.getItem("productDiscount")) || [];
+
+  // calculate discount persentage
+    const totalDiscount = discountData.reduce((total, discount) => {
+      return discount.productDiscount + total
+    }, 0)
+
+  if (isLoading) return <LoadingPage />;
+  if (error) return <ErrorPage />;
 
   const totalPrice = getCart?.reduce((acc, item) => acc + item.product_id?.price * item.quantity, 0) || 0;
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 flex justify-center">
+    <div className="min-h-screen bg-gray-100 p-4 flex justify-center pt-20">
       <div className="max-w-5xl w-full grid grid-cols-3 gap-6">
         {/* Left Section - Cart Items */}
         <div className="col-span-2 bg-white p-6 rounded-lg shadow-lg">
@@ -59,10 +79,10 @@ export default function Cart() {
                   <div>
                     <h3 className="text-lg font-semibold">{item.product_id?.title}</h3>
                     <p className="text-gray-500">₹{item.product_id?.price}</p>
-                    <p className="text-red-500 font-semibold">{item.stock ? "In Stock" : "Out Of Stock"}</p>
+                    <p className="text-red-500 font-semibold">{item.quantity >= 1 ? <p className="text-green-600">In Stock</p> : "Out Of Stock"}</p>
                   </div>
                 </div>
-                <button className="text-red-500 hover:text-red-700" onClick={() => handleRemove(item._id)}>
+                <button className="text-red-500 hover:text-red-700" onClick={() => handleRemove(item._id, item.product_id?._id)}>
                   REMOVE
                 </button>
               </div>
@@ -80,16 +100,16 @@ export default function Cart() {
             </p>
             <p className="flex justify-between text-gray-700">
               <span>Discount</span>
-              <span className="text-green-600">-₹500</span>
+              <span className="text-green-600">₹{totalDiscount}</span>
             </p>
             <p className="flex justify-between text-gray-700">
               <span>Delivery Charges</span>
-              <span className="text-green-600">Free</span>
+              {totalPrice - totalDiscount >= 500 ? <span className="text-green-600">Free</span> : <span className="text-green-600">₹40</span>}
             </p>
             <hr />
             <p className="flex justify-between font-semibold text-lg">
               <span>Total Amount</span>
-              <span>₹{(totalPrice - 500).toFixed(2)}</span>
+              {totalPrice - totalDiscount >= 500 ? <span>₹{(totalPrice - totalDiscount).toFixed(2)}</span> : <span>₹{(totalPrice - totalDiscount + 40).toFixed(2)}</span>}
             </p>
             <button onClick={handelPlaceOrder} className="mt-4 w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600">
               PLACE ORDER

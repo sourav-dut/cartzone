@@ -1,13 +1,15 @@
 import React from "react";
 import { useGetAllUsersQuery } from "../../features/api/userApi";
+import LoadingPage from "../../components/LoadingPage";
+import ErrorPage from "../../components/ErrorPage";
 
 const Coustomers = () => {
   const { data: allUsers, isLoading, error } = useGetAllUsersQuery();
   if (!isLoading) console.log(allUsers);
   
 
-  if (isLoading) return <p className="text-center mt-10">Loading...</p>;
-  if (error) return <p className="text-center text-red-500">Error loading users</p>;
+  if (isLoading) return <LoadingPage />;
+  if (error) return <ErrorPage />;
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white shadow-lg rounded-lg">

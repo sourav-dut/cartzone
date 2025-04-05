@@ -4,7 +4,7 @@ import AdminSidebar from './AdminSidebar'
 
 const AdminDashboard = () => {
   return (
-    <div className='flex'>
+    <div className='flex pt-17'>
         <AdminSidebar />
         <div className='ml-16'>
           <Outlet />

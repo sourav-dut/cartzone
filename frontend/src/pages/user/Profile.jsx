@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Edit, Save, User } from "lucide-react";
 import { useGetUserQuery, useUpdateUserMutation } from "../../features/api/userApi";
+import LoadingPage from "../../components/LoadingPage";
+import ErrorPage from "../../components/ErrorPage";
 
 export default function UserProfile() {
   const [isEditing, setIsEditing] = useState(false);
@@ -12,7 +14,7 @@ export default function UserProfile() {
 
   const {data: userProfile, isLoading, error, refetch} = useGetUserQuery();
   console.log(userProfile);
-  const [updateUser, {isLoading: updateIsLoading}] = useUpdateUserMutation();
+  const [updateUser, {isLoading: updateIsLoading, error: updateError}] = useUpdateUserMutation();
   
 
   const handleChange = (e) => {
@@ -26,11 +28,11 @@ export default function UserProfile() {
     refetch();
   };
 
-  if (isLoading) return <p className="text-green-600">Loading.......................</p>
-  if (error) return <p className="text-red-600">Error</p>
+  if (isLoading || updateIsLoading) return <LoadingPage />
+  if (error || updateError) return <ErrorPage />
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
+    <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10 pt-20">
       <div className="flex flex-col items-center gap-4">
         <img
           src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJIwASCJpICHRbFDOQXQ2S-pmikc8vs6K2GA&s"

@@ -19,6 +19,7 @@ import CheckoutPage from './pages/user/customer/CheckoutPage'
 import OrderPage from './pages/admin/OrderPage'
 import CustomerOrders from './pages/user/customer/CustomerOrders'
 import Coustomers from './pages/admin/Coustomers'
+import ProductPage from './pages/user/customer/ProductPage'
 
 export const router = createBrowserRouter([
   {
@@ -48,6 +49,10 @@ export const router = createBrowserRouter([
       {
         path: "/address/:userId",
         element: <Address />
+      },
+      {
+        path: "/products",
+        element: <ProductPage />
       },
       {
         path: '/product/:productId',

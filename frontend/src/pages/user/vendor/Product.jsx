@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useGetAllSubSubCategoryQuery } from "../../../features/api/categoryApi";
+import { useGetAllCategoryQuery, useGetAllSubSubCategoryQuery } from "../../../features/api/categoryApi";
 import NotFound from "../../../components/NotFound";
 import { useGetAllBrandQuery } from "../../../features/api/barndsApi";
 import { useCreateProductMutation, useGetAllProductsQuery } from "../../../features/api/productApi";
@@ -7,9 +7,12 @@ import { toast } from 'react-toastify';
 import { useUploadImagesMutation } from "../../../features/api/cloudApi";
 
 export default function Product() {
-    const { data: sub_categories, isLoading: isCategoryLoading, error } = useGetAllSubSubCategoryQuery();
+    const { data: all_categories, isLoading: isCategoryLoading, error } = useGetAllCategoryQuery();
+    if (!isCategoryLoading) console.log(all_categories.categories)
     const { data: getAllBrand, isLoading: isBrandLoading, error: brandError } = useGetAllBrandQuery();
     const { data: getAllProducts, isLoading: productLoading, error: productError, refetch } = useGetAllProductsQuery();
+    if (!productLoading) console.log(getAllProducts);
+    
     const [createProduct] = useCreateProductMutation();
     const [uploadImages, { isLoading: imageIsLoading }] = useUploadImagesMutation();
 
@@ -19,7 +22,7 @@ export default function Product() {
         discountPercentage: "",
         stockQuantity: "",
         price: "",
-        sub_sub_category_id: "",
+        category_id: "",
         brand_id: "",
         images: [],
     });
@@ -35,7 +38,7 @@ export default function Product() {
     };
 
     const handleCategoryChange = (e) => {
-        setFormData({ ...formData, sub_sub_category_id: e.target.value });
+        setFormData({ ...formData, category_id: e.target.value });
     };
 
     const handleBrandChange = (e) => {
@@ -101,7 +104,7 @@ export default function Product() {
                 discountPercentage: formData.discountPercentage,
                 stockQuantity: formData.stockQuantity,
                 price: formData.price,
-                sub_sub_category_id: formData.sub_sub_category_id,
+                category_id: formData.category_id,
                 brand_id: formData.brand_id,
                 images: imageUrls, // Use the extracted URLs
             };
@@ -117,7 +120,7 @@ export default function Product() {
                 discountPercentage: "",
                 stockQuantity: "",
                 price: "",
-                sub_sub_category_id: "",
+                category_id: "",
                 brand_id: "",
                 images: [],
             });
@@ -203,14 +206,14 @@ export default function Product() {
                             <label className="text-gray-700 font-semibold">Select Category</label>
                             <select
                                 className="border rounded-lg p-2 w-full"
-                                value={formData.sub_sub_category_id}
+                                value={formData.category_id}
                                 onChange={handleCategoryChange}
                                 required
                             >
                                 <option value="">-- Select a Category --</option>
-                                {sub_categories?.categories?.map((category) => (
+                                {all_categories?.categories?.filter((category) => category.parent_id != null).map((category) => (
                                     <option key={category._id} value={category._id}>
-                                        {category.sub_sub_category_name}
+                                        {category.name}
                                     </option>
                                 ))}
                             </select>
@@ -298,13 +301,14 @@ export default function Product() {
                                     {getAllProducts.map((product, index) => (
                                         <tr key={index} className="border-b">
                                             <td className="p-2 flex gap-2">
-                                                {product.images.map((image, imgIndex) => (
+                                                {/* {product.images.map((image, imgIndex) => (
                                                     <img key={imgIndex} src={image} className="w-12 h-12 object-cover rounded-lg" alt="Product image" />
-                                                ))}
+                                                ))} */}
+                                                <img src={product.images[0]} className="w-12 h-12 object-cover rounded-lg" alt="Product image" />
                                             </td>
                                             <td className="p-2">{product.title}</td>
                                             <td className="p-2">₹{product.price}</td>
-                                            <td className="p-2">{product.sub_sub_category_id.sub_sub_category_name}</td>
+                                            <td className="p-2">{product.category_id.name}</td>
                                             <td className="text-red-500 cursor-pointer">Delete</td>
                                         </tr>
                                     ))}

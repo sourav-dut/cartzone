@@ -19,7 +19,16 @@ export const productApi = createApi({
 
   endpoints: (builder) => ({
     getAllProducts: builder.query({
-      query: () => '/get-all',
+      query: (params) => ({
+        url: '/get-all',
+        params: params
+      })
+    }),
+    searchSuggestion: builder.query({
+      query: (params) => ({
+        url: '/search',
+        params: params
+      })
     }),
     getProductById: builder.query({
       query: (id) => `/${id}`,
@@ -37,11 +46,8 @@ export const productApi = createApi({
         method: "DELETE"
       })
     }),
-    searchProducts: builder.query({
-      query: (keyword) => `/search?keyword=${keyword}`,
-  }),
   }),
 });
 
 // Auto-generated hooks for the endpoints
-export const { useGetAllProductsQuery, useGetProductByIdQuery, useCreateProductMutation, useDeleteProductMutation, useSearchProductsQuery } = productApi;
+export const { useGetAllProductsQuery, useSearchSuggestionQuery,  useGetProductByIdQuery, useCreateProductMutation, useDeleteProductMutation } = productApi;

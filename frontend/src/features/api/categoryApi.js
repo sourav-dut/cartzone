@@ -20,8 +20,14 @@ export const categoryApi = createApi({
     getAllSubSubCategory: builder.query({
       query: () => '/child-category/get',
     }),
+    getAllSubCategory: builder.query({
+      query: () => '/sub-category/get'
+    }),
+    getAllCategory: builder.query({
+      query: () => '/get'
+    }),
   }),
 });
 
 // Auto-generated hooks for the endpoints
-export const { useGetAllSubSubCategoryQuery } = categoryApi;
+export const { useGetAllSubSubCategoryQuery, useGetAllSubCategoryQuery, useGetAllCategoryQuery } = categoryApi;

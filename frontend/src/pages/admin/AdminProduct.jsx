@@ -1,8 +1,10 @@
 import React from 'react';
 import { useDeleteProductMutation, useGetAllProductsQuery } from '../../features/api/productApi';
+import ErrorPage from '../../components/ErrorPage';
+import LoadingPage from '../../components/LoadingPage';
 
 const ProductPage = () => {
-    const { data: products, isLoading, error } = useGetAllProductsQuery();
+    const { data: products, isLoading, error, refetch } = useGetAllProductsQuery();
     if (!isLoading) {
         console.log(products);
 
@@ -12,11 +14,12 @@ const ProductPage = () => {
     const handleDelete = async (id) => {
         if (confirm('Are you sure you want to delete this product?')) {
             await deleteProduct(id).unwrap();
+            refetch();
         }
     };
 
-    if (isLoading) return <p>Loading products...</p>;
-    if (error) return <p>Error fetching products</p>;
+    if (isLoading) return <LoadingPage />;
+    if (error) return <ErrorPage />;
 
     return (
         <div className="p-6">
