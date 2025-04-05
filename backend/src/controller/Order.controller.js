@@ -14,7 +14,7 @@ export const createOrder = async (req, res) => {
 export const getOrderByUserId = async (req, res) => {
     try {
         const { id } = req.params
-        const results = await OrdreModel.find({ user_id: id })
+        const results = await OrdreModel.find({ user_id: id }).populate(["product_id"])
         res.status(200).json(results)
     } catch (error) {
         console.log(error);

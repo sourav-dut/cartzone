@@ -2,7 +2,7 @@ import { CartModel } from "../../model/Cart.model.js";
 
 export const createCart = async (req, res) => {
     try {
-        const { product_id, quantity } = req.body;
+        const { product_id, quantity, discountPrice } = req.body;
 
         const exisistingCart = await CartModel.findOne({product_id, user_id: req.body.user._id});
         console.log("cart", exisistingCart);
@@ -17,7 +17,8 @@ export const createCart = async (req, res) => {
         const created = await new CartModel({
             user_id: req.body.user._id,
             product_id,
-            quantity
+            quantity,
+            discountPrice
         }).populate({ path: "product_id", populate: { path: "brand_id" } });
         await created.save();
 

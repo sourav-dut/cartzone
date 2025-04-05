@@ -1,4 +1,8 @@
-export const generateOTP = () => {
-    const otp = Math.floor(1000 + Math.random() * 9000);
-    return otp.toString();
-}
+export const generateOTP = (length = 4) => {
+    const digits = '0123456789';
+    let otp = '';
+    for (let i = 0; i < length; i++) {
+        otp += digits[Math.floor(Math.random() * 10)];
+    }
+    return otp;
+};

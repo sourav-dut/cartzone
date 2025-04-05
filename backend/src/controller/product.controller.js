@@ -11,7 +11,7 @@ export const createProduct = async (req, res) => {
             price,
             discountPercentage,
             // variant_option_id,
-            sub_sub_category_id,
+            category_id,
             brand_id,
             stockQuantity,
             thumbnail,
@@ -20,7 +20,7 @@ export const createProduct = async (req, res) => {
 
             console.log("products",req.body);
 
-        if (!title || !description || !price || !sub_sub_category_id || !brand_id || !stockQuantity) {
+        if (!title || !price || !category_id || !brand_id || !stockQuantity) {
             return res.status(404).send({
                 success: false,
                 msg: "All fildes are required"
@@ -34,9 +34,9 @@ export const createProduct = async (req, res) => {
             discountPercentage,
             user_id: req.body.user._id,
             // variant_option_id,
-            sub_sub_category_id,
+            category_id,
             brand_id,
-            sku: generateSKU(title, String(price), sub_sub_category_id),
+            sku: generateSKU(title, String(price), category_id),
             stockQuantity,
             thumbnail,
             images,
@@ -63,18 +63,31 @@ export const getAllProduct = async (req, res) => {
         let limit = 0;      // Number of documents to fetch (for pagination)
 
         // get barnd_id through query parameter
-        if (req.query.brand && mongoose.Types.ObjectId.isValid(req.query.brand)) {
-            filter.brand_id = new mongoose.Types.ObjectId(req.query.brand);
+        console.log("query", req.query);
+        
+        if (req.query.brand && mongoose.Types.ObjectId.isValid(req.query.brand)) {   // if the brand query parameter is present and is a valid MongoDB ObjectId, it is added to the filter
+            filter.brand_id = new mongoose.Types.ObjectId(req.query.brand);  // Converts the brand value (which is a string) into a MongoDB ObjectId.
         } else if (req.query.brand) {
             console.log("Invalid brand ID:", req.query.brand);
         }
 
-        // get sub_sub_category_id through query parameter
+        // get category_id through query parameter
         if (req.query.category && mongoose.Types.ObjectId.isValid(req.query.category)) {
-            filter.sub_sub_category_id = new mongoose.Types.ObjectId(req.query.category);
+            filter.category_id = new mongoose.Types.ObjectId(req.query.category);
         } else if (req.query.category) {
             console.log("Invalid category ID:", req.query.category);
         }
+
+        // Search system: Matches title or description (case-insensitive)
+        if (req.query.search) {
+            const searchRegex = new RegExp(req.query.search, "i"); // Case-insensitive search
+            filter.$or = [
+                { title: searchRegex },
+                { description: searchRegex },
+            ];
+        }
+
+        console.log("filter",filter);
 
         if (req.query.user) {
             filter['isDeleted'] = false
@@ -91,20 +104,21 @@ export const getAllProduct = async (req, res) => {
 
         console.log("Filter", filter);
 
-        if (req.query.page && req.query.limit) {
-            const pageSize = req.query.limit;
-            const page = req.query.page;
+         // Pagination
+         if (req.query.page && req.query.limit) {
+            const pageSize = parseInt(req.query.limit);
+            const page = parseInt(req.query.page);
 
-            skip = pageSize * (page - 1); // Skip documents from previous pages
-            limit = pageSize;  // Limit the number of documents per request
+            skip = pageSize * (page - 1);
+            limit = pageSize;
         }
 
-        const totalDocs = await productModel.find(filter).sort(sort).populate("brand_id").populate("sub_sub_category_id").countDocuments().exec();
+        const totalDocs = await productModel.find(filter).sort(sort).populate("brand_id").populate("category_id").countDocuments().exec();
         /*productModel.find(filter): Finds products matching the filter.
         .countDocuments(): Counts the total number of matching products.
         .exec(): Executes the query.*/
 
-        const results = await productModel.find(filter).sort(sort).populate("brand_id").populate("sub_sub_category_id").skip(skip).limit(limit).exec();
+        const results = await productModel.find(filter).sort(sort).populate("brand_id").populate("category_id").skip(skip).limit(limit).exec();
         /*filter → Filter conditions (e.g., brand, category).
         sort → Sorting order (e.g., price ascending).
         skip(skip) → Skips items for pagination.
@@ -122,17 +136,41 @@ export const getAllProduct = async (req, res) => {
     }
 };
 
+// get SearchSuggestion
+export const searchSuggestions = async (req, res) => {
+    try {
+        if (!req.query.search) {
+            return res.status(400).json({ message: "Search query is required" });
+        }
+
+        const searchRegex = new RegExp(req.query.search.trim(), "i");
+
+        const suggestions = await productModel
+            .find({ title: searchRegex }) // Matching titles
+            .limit(5) // Limit results for performance
+            .select("title") // Only return titles
+            .exec();
+
+        return res.status(200).json(suggestions);
+    } catch (error) {
+        console.error("Error fetching search suggestions:", error);
+        return res.status(500).json({ message: "Error fetching suggestions" });
+    }
+};
+
+
 // Get Product by Id
 export const getProductById = async (req, res) => {
     try {
         const { id } = req.params
-        const result = await productModel.findById(id).populate("brand_id").populate("sub_sub_category_id");
+        const result = await productModel.findById(id).populate("brand_id").populate("category_id");
         res.status(200).json(result)
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: 'Error getting product details, please try again later' })
+        res.status(500).json({ message: 'Error getting product details, please try again later', error })
     }
 };
+
 
 // Update Product by Id
 export const updateProductById = async (req, res) => {
@@ -144,7 +182,8 @@ export const updateProductById = async (req, res) => {
         console.log(error);
         res.status(500).json({ message: 'Error updating product, please try again later' })
     }
-}
+};
+
 
 // Un-delete by Id
 export const undeleteProductById = async (req, res) => {
@@ -158,6 +197,7 @@ export const undeleteProductById = async (req, res) => {
     }
 };
 
+
 // Delete by Id
 export const deleteProductById = async (req, res) => {
     try {
@@ -168,4 +208,4 @@ export const deleteProductById = async (req, res) => {
         console.log(error);
         res.status(500).json({ message: 'Error deleting product, please try again later' })
     }
-}
+};

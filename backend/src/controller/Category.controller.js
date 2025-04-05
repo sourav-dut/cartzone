@@ -1,19 +1,16 @@
-import { CategoryModel } from "../../model/inv_category.model.js";
 import slugify from 'slugify';
-import { SubCategoryModel } from "../../model/inv_sub_Category.model.js";
-import { SubSubCategoryModel } from "../../model/inv_sub_sub_Category.model.js";
+import { Category } from '../../model/Category.model.js';
 
 //////////////// Category ///////////////////////////
 // Create Category
 export const createCategory = async (req, res) => {
     try {
-        const {category_name} = req.body;
-        if (!category_name) return res.status(404).send({msg: "Please enter the category name"});
+        const { name, parent_id } = req.body;
+        if (!name) return res.status(404).send({ msg: "Please enter the category name" });
 
-        const category = await new CategoryModel({category_name, slug: slugify(category_name)}).save();
+        const category = await new Category({ name, parent_id: parent_id || null, slug: slugify(name) }).save();
 
         return res.status(201).json({
-            success: true,
             category
         })
     } catch (error) {
@@ -28,13 +25,17 @@ export const createCategory = async (req, res) => {
 // Get Category
 export const getCategory = async (req, res) => {
     try {
-        const categories = await CategoryModel.find({});
-        if (!categories) return res.status(404).json({msg: "Sorry! no categories found"});
+        const categories = await Category.find({}).populate({
+            path: "parent_id",
+            select: "name",
+            populate: { path: "parent_id", select: "name" }
+        });
+        if (!categories) return res.status(404).json({ msg: "Sorry! no categories found" });
 
         return res.status(201).json({
-            success: true,
             categories
-        })
+        });
+        
     } catch (error) {
         console.log(error);
         return res.status(500).send({
@@ -47,8 +48,8 @@ export const getCategory = async (req, res) => {
 // Update Category
 export const updateCategory = async (req, res) => {
     try {
-        const {new_category_name} = req.body;
-        const updatedCategory = await CategoryModel.findByIdAndUpdate(req.params.id, { category_name: new_category_name});
+        const { new_category_name } = req.body;
+        const updatedCategory = await CategoryModel.findByIdAndUpdate(req.params.id, { category_name: new_category_name });
 
         return res.status(201).json({
             success: true,
@@ -66,139 +67,17 @@ export const updateCategory = async (req, res) => {
 // Delete Category
 export const deleteCategory = async (req, res) => {
     try {
-        await CategoryModel.findByIdAndDelete(req.params.id);
+        const { id } = req.params;
 
-        return res.status(201).json({
-            success: true,
-            masg: "Category Deleted Successfully"
-        })
-    } catch (error) {
-        console.log(error);
-        return res.status(500).send({
-            success: false,
-            message: "Error occured while delete a new Category, please try again later"
-        })
-    }
-};
+        // Check if the category has children
+        const subcategories = await Category.find({ parent_id: id });
+        if (subcategories.length > 0) {
+            return res.status(400).json({ message: "Delete subcategories first" });
+        }
 
-
-//////////////// Sub-Category ///////////////////////////
-
-// Create Category
-export const createSubCategory = async (req, res) => {
-    try {
-        const {sub_category_name, category_id} = req.body;
-        if (!sub_category_name) return res.status(404).send({msg: "Please enter the sub_category name"});
-
-        const sub_category = await new SubCategoryModel({sub_category_name, category_id, slug: slugify(sub_category_name)}).save();
-
-        return res.status(201).json({
-            success: true,
-            sub_category
-        })
-    } catch (error) {
-        console.log(error);
-        return res.status(500).send({
-            success: false,
-            message: "Error occured while create a new SubCategory, please try again later"
-        })
-    }
-};
-
-// Get SubCategory
-export const getSubCategory = async (req, res) => {
-    try {
-        const sub_categories = await SubCategoryModel.find({});
-        if (!sub_categories) return res.status(404).json({msg: "Sorry! no categories found"});
-
-        return res.status(201).json({
-            success: true,
-            sub_categories
-        })
-    } catch (error) {
-        console.log(error);
-        return res.status(500).send({
-            success: false,
-            message: "Error occured while get SubCategory, please try again later"
-        })
-    }
-};
-
-// Delete SubCategory
-export const deleteSubCategory = async (req, res) => {
-    try {
-        await SubCategoryModel.findByIdAndDelete(req.params.id);
-
-        return res.status(201).json({
-            success: true,
-            masg: "Category Deleted Successfully"
-        })
-    } catch (error) {
-        console.log(error);
-        return res.status(500).send({
-            success: false,
-            message: "Error occured while delete a new SubCategory, please try again later"
-        })
-    }
-};
-
-
-//////////////// Sub-Sub-Category ///////////////////////////
-
-// Create SubSubCategory
-export const createSubSubCategory = async (req, res) => {
-    try {
-        const {sub_sub_category_name, sub_category_id} = req.body;
-        if (!sub_sub_category_name) return res.status(404).send({msg: "Please enter the sub_sub_category name"});
-
-        const sub_sub_category = await new SubSubCategoryModel({sub_sub_category_name, sub_category_id, slug: slugify(sub_sub_category_name)}).save();
-
-        return res.status(201).json({
-            success: true,
-            sub_sub_category
-        })
-    } catch (error) {
-        console.log(error);
-        return res.status(500).send({
-            success: false,
-            message: "Error occured while create a new SubSubCategory, please try again later"
-        })
-    }
-};
-
-// Get SubSubCategory
-export const getSubSubCategory = async (req, res) => {
-    try {
-        const categories = await SubSubCategoryModel.find({});
-        if (!categories) return res.status(404).json({msg: "Sorry! no categories found"});
-
-        return res.status(201).json({
-            success: true,
-            categories
-        })
-    } catch (error) {
-        console.log(error);
-        return res.status(500).send({
-            success: false,
-            message: "Error occured while get SubSubCategory, please try again later"
-        })
-    }
-};
-
-// Delete SubSubCategory
-export const deleteSubSubCategory = async (req, res) => {
-    try {
-        await SubSubCategoryModel.findByIdAndDelete(req.params.id);
-
-        return res.status(201).json({
-            success: true,
-            masg: "Category Deleted Successfully"
-        })
-    } catch (error) {
-        console.log(error);
-        return res.status(500).send({
-            success: false,
-            message: "Error occured while delete a new SubSubCategory, please try again later"
-        })
+        await Category.findByIdAndDelete(id);
+        res.json({ message: "Category deleted" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 };

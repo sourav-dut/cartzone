@@ -7,14 +7,13 @@ const productSchema = new Schema({
     },
     description:{
         type:String,
-        required:true
     },
     price:{
         type:Number,
         required:true
     },
     discountPercentage: {
-        type: String,
+        type: Number,
         default: 0,
     },
     user_id: {
@@ -26,9 +25,9 @@ const productSchema = new Schema({
     //     ref: "VariantOption",
     //     default: null
     // },
-    sub_sub_category_id:{
+    category_id:{
         type:Schema.Types.ObjectId,
-        ref:"SubSubCategory",
+        ref:"Category",
         required:true
     },
     brand_id:{
@@ -41,7 +40,8 @@ const productSchema = new Schema({
     },
     stockQuantity:{
         type:Number,
-        required:true
+        required:true,
+        default: 0
     },
     thumbnail:{
         type:String,
