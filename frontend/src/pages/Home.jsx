@@ -7,6 +7,7 @@ import LoadingPage from "../components/LoadingPage";
 import { useRef } from "react";
 import ErrorPage from "../components/ErrorPage";
 
+
 export default function Home() {
   const { data: getAllProducts, isLoading, error } = useGetAllProductsQuery();
   const [createCart] = useCreateCartMutation();
@@ -54,7 +55,7 @@ export default function Home() {
       {/* Hero Section */}
       <section
         className="bg-gray-100 py-16 px-6 text-center"
-        style={{ backgroundImage: 'url("https://img.freepik.com/premium-photo/3d-rendering-online-shopping-chile-social-media-websites_307791-4355.jpg?w=1380")', backgroundSize: "cover" }}
+        // style={{ backgroundImage: 'url("https://img.freepik.com/premium-photo/3d-rendering-online-shopping-chile-social-media-websites_307791-4355.jpg?w=1380")', backgroundSize: "cover" }}
       >
         <h1 className="text-4xl font-bold">Discover the Best Deals on Top Brands</h1>
         <p className="mt-4 text-gray-600">Shop the latest trends and enjoy fast delivery!</p>
@@ -82,7 +83,10 @@ export default function Home() {
         <h2 className="text-2xl font-bold text-center">Featured Products</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 mt-6">
           {getAllProducts?.map((product) => (
-            <div key={product._id} onClick={() => navigate(`/product/${product._id}`)} className="bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition p-4 cursor-pointer flex flex-col justify-between">
+            <div key={product._id} onClick={() => {
+              navigate(`/product/${product._id}`)
+              window.scrollTo(0, 0); // force scroll after click
+            }} className="bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition p-4 cursor-pointer flex flex-col justify-between">
               <img src={product.images[0]} alt={product.title} className="h-40 w-full object-contain" />
               <h3 className="mt-2 text-sm font-semibold line-clamp-2">{product.title}</h3>
               <div className="flex items-center justify-between mt-1">

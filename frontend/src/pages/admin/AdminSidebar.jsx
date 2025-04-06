@@ -13,7 +13,7 @@ const AdminSidebar = () => {
 
   return (
     <div className="w-64 min-h-screen bg-gray-900 text-gray-200 p-5">
-      <h2 className="text-2xl font-bold text-white mb-6 text-center">Vendor Panel</h2>
+      <h2 className="text-2xl font-bold text-white mb-6 text-center">Admin Panel</h2>
       <nav>
         <ul>
           {menuItems.map((item) => (

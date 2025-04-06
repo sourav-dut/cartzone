@@ -17,7 +17,17 @@ export default function Cart() {
 
   useEffect(() => {
     refetch();
-  }, [])
+  }, []);
+
+   // when a page is open i want to open with top
+    useEffect(() => {
+      if ("scrollRestoration" in history) {
+        history.scrollRestoration = "manual";
+      }
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+      }, 50);
+    }, []);
 
   const [deleteCartItem] = useDeleteCartMutation();
 

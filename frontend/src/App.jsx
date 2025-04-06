@@ -20,6 +20,8 @@ import OrderPage from './pages/admin/OrderPage'
 import CustomerOrders from './pages/user/customer/CustomerOrders'
 import Coustomers from './pages/admin/Coustomers'
 import ProductPage from './pages/user/customer/ProductPage'
+import AdminRoute from './components/AdminRoute'
+import VendorRoute from './components/VendorRoute'
 
 export const router = createBrowserRouter([
   {
@@ -73,7 +75,11 @@ export const router = createBrowserRouter([
       // VENDOR
       {
         path: "/vendor",
-        element: <Dashboard />,
+        element: (
+          <VendorRoute>
+            <Dashboard />
+          </VendorRoute>
+        ),
         children: [
           {
             path: "",
@@ -88,7 +94,11 @@ export const router = createBrowserRouter([
       // ADMIN
       {
         path: "/admin",
-        element: < AdminDashboard/>,
+        element: (
+          <AdminRoute>
+            <AdminDashboard />
+          </AdminRoute>
+        ),
         children: [
           {
             path: "",

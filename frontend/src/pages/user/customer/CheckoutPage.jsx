@@ -17,6 +17,16 @@ const CheckoutOut = () => {
   const [paymentMethod, setPaymentMethod] = useState(false);
   const [searchParams] = useSearchParams();
 
+  // when a page is open i want to open with top
+  useEffect(() => {
+    if ("scrollRestoration" in history) {
+      history.scrollRestoration = "manual";
+    }
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+    }, 50);
+  }, []);
+
   // Get the query 
   const productId = searchParams.get("productId") || "";  // this user_id is for buy now
 
@@ -68,8 +78,8 @@ const CheckoutOut = () => {
 
   useEffect(() => {
     if (productId) {
-      const discountAmount = Math.floor(product.price * product.discountPercentage / 100);
-      const discountPrice = product.price - discountAmount;
+      const discountAmount = Math.floor(product?.price * product?.discountPercentage / 100);
+      const discountPrice = product?.price - discountAmount;
       setDiscountPrice(discountPrice);
     }
     if (userId && addresses?.[index]?._id) {

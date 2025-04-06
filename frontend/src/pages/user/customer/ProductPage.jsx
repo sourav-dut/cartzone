@@ -8,9 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useGetAllBrandQuery } from "../../../features/api/barndsApi";
 import LoadingPage from "../../../components/LoadingPage";
 import ErrorPage from "../../../components/ErrorPage";
-import { ShoppingCart, Star } from "lucide-react";
-import { useCreateCartMutation } from "../../../features/api/cartApi";
-import { toast } from "react-toastify";
+import { Star } from "lucide-react";
 
 const minPrice = 100;
 const maxPrice = 500000;
@@ -19,6 +17,8 @@ export default function ProductPage() {
   const [categoryId, setCategoryId] = useState(null);
   const [brandId, setBrandId] = useState(null);
   const [price, setPrice] = useState([minPrice, maxPrice]);
+  const [page, setPage] = useState(1);
+  const limit = 12;
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -37,10 +37,9 @@ export default function ProductPage() {
     }, 50); // Small delay ensures it works properly
   }, []);
 
-  const { data: allProduct, isLoading, error, refetch } = useGetAllProductsQuery({ category: categoryId, brand: brandId, search: searchQuery });
+  const { data: allProduct, isLoading, error, refetch } = useGetAllProductsQuery({ category: categoryId, brand: brandId, search: searchQuery, page, limit });
   const { data: allBrand, isLoading: isBrandLoading, error: brandError, refetch: brandRefetch } = useGetAllBrandQuery();
   const { data: all_categories, isLoading: isCategoryLoading, error: categoryError, refetch: categoryRefetch } = useGetAllCategoryQuery();
-  const [createCart, { isLoading: cartIsLoading, error: cartError }] = useCreateCartMutation();
 
   const isCategory = useSelector((state) => state.auth.isMainCategory);
   const mainCategoryId = useSelector((state) => state.auth.mainCategoryId);
@@ -56,26 +55,6 @@ export default function ProductPage() {
     setCategoryId(categoryId);
     categoryRefetch()
   };
-
-  // Add to Cart
-  // const { _id: userId } = JSON.parse(localStorage.getItem("user") || "{}");
-
-  // const handleCart = async (productId) => {
-  //   if (!userId) {
-  //     toast.error("Please log in to add items to the cart!");
-  //     navigate("/login");
-  //     return;
-  //   }
-  //   try {
-  //     await createCart({ product_id: productId, quantity: 1 }).unwrap();
-  //     toast.success("Added to cart successfully");
-  //     navigate(`/cart/${userId}`);
-  //     refetch();
-  //   } catch (error) {
-  //     console.log(error);
-  //     toast.error(error.data.msg);
-  //   }
-  // };
 
   // Price Section
   const handleChange = (event, type) => {
@@ -270,6 +249,30 @@ export default function ProductPage() {
               </div>
             ))}
           </div>
+          {/* Pagination Controls */}
+          {/* {allProduct?.totalPages > 1 && ( */}
+            {allProduct.length > 10 ? (
+              <div className="flex justify-center items-center gap-4 mt-8">
+              <button
+                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                disabled={page === 1}
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50"
+              >
+                Prev
+              </button>
+              <span className="text-gray-700 font-medium">
+                Page {page} of {allProduct?.totalPages}
+              </span>
+              <button
+                onClick={() => setPage((prev) => prev + 1)}
+                disabled={page === allProduct?.totalPages}
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+            ) : (<></>)}
+          {/* )} */}
 
         </div>
       </div>

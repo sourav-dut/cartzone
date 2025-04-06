@@ -16,7 +16,6 @@ export default function ProductDetails() {
   const [selectedImage, setSelectedImage] = useState("");
   const [productDiscount, setProductDiscount] = useState(0);
 
-  // Calculate and store discount once when product loads
   useEffect(() => {
     if (product) {
       const discountAmount = Math.floor(product.price * product.discountPercentage / 100);
@@ -45,7 +44,7 @@ export default function ProductDetails() {
       toast.success("Added to cart successfully");
 
       let discountData = JSON.parse(localStorage.getItem("productDiscount")) || [];
-      discountData.push({productId: productId, productDiscount: productDiscount});
+      discountData.push({ productId: productId, productDiscount: productDiscount });
       localStorage.setItem("productDiscount", JSON.stringify(discountData));
 
       navigate(`/cart/${userId}`);
@@ -69,69 +68,91 @@ export default function ProductDetails() {
   if (!product) return <p className="text-center mt-10">Product not found</p>;
 
   return (
-    <div className="max-w-6xl mx-auto p-6 pt-20">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="flex gap-4 items-start">
-          <div className="flex flex-col space-y-4">
-            {product.images.map((img, index) => (
+    <div className="max-w-7xl mx-auto p-6 pt-24">
+      <div className="grid grid-cols-1 md:grid-cols-2 mr-10 gap-8">
+        {/* Left: Product Images */}
+        <div>
+          <img
+            src={selectedImage}
+            alt={product.title}
+            className="w-full h-[400px] object-contain rounded-lg"
+          />
+          <div className="flex justify-center gap-4 mt-4">
+            {product.images.map((img, idx) => (
               <img
-                key={index}
+                key={idx}
                 src={img}
-                alt={product.title}
-                className={`w-20 h-20 object-cover rounded-lg cursor-pointer border-2 ${
-                  selectedImage === img ? "border-blue-500" : "border-gray-200"
-                }`}
+                alt={`thumb-${idx}`}
+                className={`w-13 h-13 object-cover rounded-b-md cursor-pointer ${selectedImage === img ? "ring-1 ring-blue-600" : ""
+                  }`}
                 onClick={() => setSelectedImage(img)}
               />
             ))}
           </div>
-          <div className="flex-1">
-            <img
-              src={selectedImage}
-              alt={product.title}
-              className="w-full h-[500px] rounded-lg object-cover border border-gray-300"
-            />
-          </div>
         </div>
 
-        <div>
-          <h1 className="text-4xl font-bold">{product.title}</h1>
-          <p className="text-gray-600 mt-4">{product.description}</p>
-          <p className="text-3xl font-semibold mt-6">₹{discountedPrice}</p>
-          <p className="text-2xl text-gray-500 line-through">₹{product.price}</p>
-          <p className="text-sm text-green-600 font-semibold">{product.discountPercentage}% Off</p>
+        {/* Right: Product Info */}
+        <div className="space-y-4">
+          <h1 className="text-2xl font-semibold">{product.title}</h1>
+          <p className="text-gray-600 text-sm">Visit the brand store</p>
 
-
-          <div className="flex items-center mt-6 text-yellow-500">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} size={24} fill={i < product.rating ? "currentColor" : "none"} />
-            ))}
-            <span className="text-gray-500 ml-2">({product.reviewsCount} reviews)</span>
+          <div className="flex-row items-center gap-4 mt-6">
+            <p className="text-2xl font-bold text-gray-800">₹{discountedPrice} <span className="text-sm text-gray-600">(Incl. of all taxes)</span></p>
+            <div>
+              <p className="text-xl text-gray-500 inline-block line-through">₹{product.price}</p>
+              <span className="text-sm font-semibold ml-3 text-green-600 bg-green-100 px-2 py-1 rounded">
+                {product.discountPercentage}% OFF
+              </span>
+            </div>
+            <p className="text-sm text-gray-600 mt-3">EMI starts from ₹4,646/mo. <span className="text-blue-600 cursor-pointer">See EMI options</span></p>
+            <p className="text-green-600 font-medium mt-2">✔ In stock</p>
           </div>
 
-          <div className="flex gap-4 mt-8">
+          {/* Quantity + Buttons */}
+          <div className="flex items-center gap-4 mt-4">
+            <label htmlFor="qty" className="text-sm">Qty</label>
+            <input
+              id="qty"
+              type="number"
+              defaultValue={1}
+              min={1}
+              className="w-16 px-2 py-1 border rounded"
+            />
+            <button
+              onClick={handleCart}
+              className="bg-white border border-gray-400 text-black px-4 py-2 rounded hover:bg-gray-100"
+            >
+              <ShoppingCart className="inline-block mr-1" size={18} />
+              Add to Cart
+            </button>
             <button
               onClick={handleBuyNow}
-              className="flex-1 bg-orange-500 text-white py-4 rounded-lg hover:bg-orange-600 text-lg font-semibold"
+              className="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800"
             >
               Buy Now
             </button>
-
-            <button
-              onClick={handleCart}
-              disabled={cartIsLoading}
-              className="flex-1 bg-yellow-500 text-white py-4 rounded-lg hover:bg-yellow-600 text-lg font-semibold"
-            >
-              {cartIsLoading ? "Adding..." : "Add to Cart"}
-            </button>
           </div>
 
-          <div className="mt-8 p-4 border border-gray-300 rounded-lg">
-            <p className="text-lg font-semibold">Available Offers:</p>
-            <ul className="list-disc list-inside mt-2 text-gray-600">
-              <li>Bank Offer: 5% Unlimited Cashback on Flipkart Axis Bank Credit Card</li>
-              <li>Special Price: Get extra 77% off (price inclusive of cashback/coupon)</li>
-              <li>Free Delivery: Within 2 Days</li>
+          {/* Delivery */}
+          <div className="mt-4 text-sm text-gray-600">
+            🚚 <span className="font-semibold">Free delivery</span> by <span className="text-green-700 font-semibold">8 April, 2025</span>
+          </div>
+
+          {/* Product Description Section */}
+          <div className="mt-8 border-t pt-6">
+            <h2 className="text-xl font-semibold mb-4">Product Description</h2>
+            <p className="text-gray-700 leading-relaxed text-sm md:text-base">
+              {product.description}
+            </p>
+          </div>
+
+          {/* Offers Section */}
+          <div className="mt-6 border border-gray-300 p-4 rounded">
+            <h3 className="text-md font-semibold text-gray-700 mb-2">Extra Deals Available</h3>
+            <ul className="space-y-1 text-sm text-gray-600 list-disc list-inside">
+              <li>Flat ₹5,000 Instant Discount on ICICI Bank Credit/Debit Card</li>
+              <li>Flat ₹4,000 Instant Discount on HDFC Credit Card EMI (6M+)</li>
+              <li>Flat ₹5,000 Instant Discount on Axis Bank Credit Card</li>
             </ul>
           </div>
         </div>
