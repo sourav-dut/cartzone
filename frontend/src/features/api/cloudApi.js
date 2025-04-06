@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const cloudApi = createApi({
   reducerPath: "cloudApi",
-  baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:1800/api/" }),
+  baseQuery: fetchBaseQuery({ baseUrl: "https://cartzone-jobq.onrender.com/api/" }),
   endpoints: (builder) => ({
     uploadImages: builder.mutation({
       query: (formData) => ({

@@ -4,7 +4,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export const productApi = createApi({
   reducerPath: 'productApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:1800/api/v1/product',
+    baseUrl: 'https://cartzone-jobq.onrender.com/api/v1/product',
     prepareHeaders: (headers) => {
       // Retrieve the token from localStorage
       const token = localStorage.getItem('token');

@@ -34,7 +34,7 @@ const _dirname = path.resolve();
 
 // middlewares
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: "https://cartzone-jobq.onrender.com",
     credentials: true
 }));
 app.use(express.json());
