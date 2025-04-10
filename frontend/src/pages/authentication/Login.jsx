@@ -58,7 +58,6 @@ export default function Login() {
   }
 
   if (error) navigate("/login");
-
   if (isLoading || isPasswordLoading) return <LoadingPage />;
 
   return (
