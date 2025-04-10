@@ -30,13 +30,14 @@ export default function Login() {
 
     const response = await login({ email, password }).unwrap();
     console.log(response);
-    if (response) {
+    if (response.success == true) {
       dispatch(setCredentials(response));
       toast.success("User logged in");
       navigate("/");
       window.location.reload();
     } else {
       toast.error("Somthing Wrong!@");
+      navigate("/login")
     }
 
     // Reset error message on successful form submission

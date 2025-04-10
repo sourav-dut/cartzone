@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import LoadingPage from "../../components/LoadingPage";
 import ErrorPage from "../../components/ErrorPage";
-import Login from "./Login";
 
 export default function Signup() {
   const [username, setUsername] = useState("");
@@ -44,7 +43,7 @@ export default function Signup() {
   };
 
   if (isLoading) return <LoadingPage />;
-  if (error) return <Login />;
+  if (error) return <ErrorPage />;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-600">
