@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import LoadingPage from "../../components/LoadingPage";
 import ErrorPage from "../../components/ErrorPage";
+import Login from "./Login";
 
 export default function Signup() {
   const [username, setUsername] = useState("");
@@ -43,7 +44,7 @@ export default function Signup() {
   };
 
   if (isLoading) return <LoadingPage />;
-  if (error) return <ErrorPage />;
+  if (error) return <Login />;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-600">
@@ -131,12 +132,12 @@ export default function Signup() {
             </button>
           </form>
 
-          {/* Register Link */}
+          {/* Login Link */}
           <div className="mt-4 text-center">
             <p className="text-sm">
-              Don't have an account?{" "}
+              Already have an account?{" "}
               <NavLink to="/login" className="text-blue-500 hover:underline">
-                Register here
+                Login here
               </NavLink>
             </p>
           </div>

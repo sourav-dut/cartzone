@@ -1,38 +1,74 @@
 import jwt, { decode } from 'jsonwebtoken'
 import userModel from '../model/user.model.js';
 
+
+// const authMiddleware = async (req, res, next) => {
+//     try {
+//         // get token from user
+//         const token = req.headers["authorization"].split(" ")[1];
+//         // console.log(token);
+        
+//         if (!token) {
+//             return res.status(404).send({
+//                 success: false,
+//                 message: "Please provide token"
+//             })
+//         };
+
+//         jwt.verify(token, process.env.JWT_SECRET, (err, decode) => {
+//             if (err) {
+//                 return res.status(404).send({
+//                     success: false,
+//                     message: "Unauthorized user"
+//                 })
+//             }
+//             req.body.user = decode.user;
+//             next();
+//         })
+        
+//     } catch (error) {
+//         console.log(error);
+//         return res.status(500).send({
+//             success: false,
+//             message: "Error in authMiddleware"
+//         })
+//     }
+// };
+
 const authMiddleware = async (req, res, next) => {
     try {
-        // get token from user
-        const token = req.headers["authorization"].split(" ")[1];
-        // console.log(token);
+        const authHeader = req.headers["authorization"];
         
-        if (!token) {
-            return res.status(404).send({
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            return res.status(401).send({
                 success: false,
-                message: "Please provide token"
-            })
-        };
+                message: "Authorization header missing or malformed",
+            });
+        }
 
-        jwt.verify(token, process.env.JWT_SECRET, (err, decode) => {
+        const token = authHeader.split(" ")[1];
+
+        jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
             if (err) {
-                return res.status(404).send({
+                return res.status(401).send({
                     success: false,
-                    message: "Unauthorized user"
-                })
+                    message: "Invalid or expired token",
+                });
             }
-            req.body.user = decode.user;
+
+            req.user = decoded.user; // attach decoded user to request
             next();
-        })
-        
+        });
+
     } catch (error) {
-        console.log(error);
+        console.error("Auth Middleware Error:", error);
         return res.status(500).send({
             success: false,
-            message: "Error in authMiddleware"
-        })
+            message: "Internal server error in auth middleware",
+        });
     }
 };
+
 
 // Admin Middleware
 const adminMiddleware = async (req, res, next) => {
