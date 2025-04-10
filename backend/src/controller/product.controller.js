@@ -32,7 +32,7 @@ export const createProduct = async (req, res) => {
             description,
             price,
             discountPercentage,
-            user_id: req.body.user._id,
+            user_id: req.user._id,
             // variant_option_id,
             category_id,
             brand_id,

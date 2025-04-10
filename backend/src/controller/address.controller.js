@@ -17,7 +17,7 @@ export const createAddress = async (req, res) => {
         };
 
         const address = await addressModel.create({
-            user_id: req.body.user._id, street, city, state, phoneNumber, pinCode, country
+            user_id: req.user._id, street, city, state, phoneNumber, pinCode, country
         });
 
         return res.status(201).send({

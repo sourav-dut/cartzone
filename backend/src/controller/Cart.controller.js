@@ -4,18 +4,18 @@ export const createCart = async (req, res) => {
     try {
         const { product_id, quantity, discountPrice } = req.body;
 
-        const exisistingCart = await CartModel.findOne({product_id, user_id: req.body.user._id});
+        const exisistingCart = await CartModel.findOne({product_id, user_id: req.user._id});
         console.log("cart", exisistingCart);
-        // console.log("user", req.body.user._id);
+        // console.log("user", req.user._id);
         // console.log("user", exisistingCart.user_id.toString());
-        if (exisistingCart && exisistingCart.user_id.toString() === req.body.user._id) {
+        if (exisistingCart && exisistingCart.user_id.toString() === req.user._id) {
             return res.status(404).json({
                 msg: "This item is already added to the cart"
             })
         }
 
         const created = await new CartModel({
-            user_id: req.body.user._id,
+            user_id: req.user._id,
             product_id,
             quantity,
             discountPrice

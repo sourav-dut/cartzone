@@ -31,11 +31,17 @@ const getAllUsersController = async (req, res) => {
 // Get User by Id
 const getUserByIdController = async (req, res) => {
     try {
-        const user = await userModel.findById(req.body.user._id);
+        if (!req.user._id) {
+            return res.status(500).send({
+                success: false,
+                message: "User not authenticated"
+            })
+        }
+        const user = await userModel.findById(req.user._id);
         if (!user) {
             return res.status(500).send({
                 success: false,
-                message: "Users not found"
+                message: "User not found"
             })
         };
 
@@ -57,7 +63,7 @@ const getUserByIdController = async (req, res) => {
 // Delete User by Id
 const deleteUserByIdController = async (req, res) => {
     try {
-        const user = await userModel.findByIdAndDelete(req.body.user._id);
+        const user = await userModel.findByIdAndDelete(req.user._id);
         if (!user) {
             return res.status(500).send({
                 success: false,
@@ -83,7 +89,7 @@ const updateUserByIdController = async (req, res) => {
     try {
         const {name, email, phone} = req.body;
         
-        const user = await userModel.findById(req.body.user._id);
+        const user = await userModel.findById(req.user._id);
         console.log(user);
         
         if (!user) {
