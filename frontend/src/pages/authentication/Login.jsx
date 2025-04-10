@@ -30,14 +30,13 @@ export default function Login() {
 
     const response = await login({ email, password }).unwrap();
     console.log(response);
-    if (response.success == true) {
+    if (response) {
       dispatch(setCredentials(response));
       toast.success("User logged in");
       navigate("/");
       window.location.reload();
     } else {
       toast.error("Somthing Wrong!@");
-      navigate("/login")
     }
 
     // Reset error message on successful form submission
@@ -58,9 +57,9 @@ export default function Login() {
     }
   }
 
-  if (isLoading || isPasswordLoading) return <LoadingPage />;
-  if (error) return <ErrorPage />;
+  if (error) navigate("/login");
 
+  if (isLoading || isPasswordLoading) return <LoadingPage />;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-300">
