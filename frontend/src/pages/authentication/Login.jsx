@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useForgotPasswordMutation, useLoginMutation } from "../../features/api/authApi";
 import { useDispatch } from "react-redux";
@@ -57,7 +57,12 @@ export default function Login() {
     }
   }
 
-  if (error) navigate("/login");
+  useEffect(() => {
+    if (error) {
+      toast.error("Login failed!");
+      navigate("/login");
+    }
+  }, [error]);
   if (isLoading || isPasswordLoading) return <LoadingPage />;
 
   return (
