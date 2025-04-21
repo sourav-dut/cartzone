@@ -73,7 +73,7 @@ const authMiddleware = async (req, res, next) => {
 // Admin Middleware
 const adminMiddleware = async (req, res, next) => {
     try {
-        const user = await userModel.findById(req.body.user._id);
+        const user = await userModel.findById(req.user._id);
 
         if (!user) {
             return res.status(404).send({
@@ -103,7 +103,7 @@ const adminMiddleware = async (req, res, next) => {
 // Vendor-Admin Middleware
 const vendorAdminMiddleware = async (req, res, next) => {
     try {
-        const user = await userModel.findById(req.body.user._id);
+        const user = await userModel.findById(req.user._id);
 
         if (!user) {
             return res.status(404).send({
