@@ -102,7 +102,7 @@ const CheckoutOut = () => {
   const handleOrder = async () => {
     try {
       if (addresses.length < 1) {
-        toast.warn("Plese select address");
+        alert("Please select address")
         return;
       }
       const response = await createOrder(orderData).unwrap();
