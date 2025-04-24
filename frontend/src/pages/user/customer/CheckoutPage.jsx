@@ -37,7 +37,7 @@ const CheckoutOut = () => {
     skip: !productId, // Skip API call if productId is undefined [condition]
   });
   if (!addressLoading) console.log(addresses);
-  const [createOrder, { isLoading: createOrderIsLoading, error: orderError}] = useCreateOrderMutation();
+  const [createOrder, { isLoading: createOrderIsLoading, error: orderError }] = useCreateOrderMutation();
   // const [sendOtp, {isLoading: sendOtpLoading}] = useResendOtpMutation();
   // const [verifyOtp, {isLoading: verifyOtpLoading}] = useVerifyOtpMutation();
   const [deleteCart] = useDeleteCartByUserIdMutation();
@@ -101,6 +101,10 @@ const CheckoutOut = () => {
   // Handel Order
   const handleOrder = async () => {
     try {
+      if (addresses.length < 1) {
+        toast.warn("Plese select address");
+        return;
+      }
       const response = await createOrder(orderData).unwrap();
       console.log(response);
       if (!productId) await deleteCart(userId).unwrap();
@@ -137,12 +141,22 @@ const CheckoutOut = () => {
             ))}
           </div>
         ) : (
-          <div className="mb-6 border-b pb-4">
-            <h2 className="text-lg font-semibold">Delivering to {addresses[index]?.user_id?.username}</h2>
-            <p className="text-sm text-gray-600">{addresses[index]?.city}, {addresses[index]?.street}, {addresses[index]?.state}, {addresses[index]?.pinCode}, {addresses[index]?.country}</p>
-            <h1 className="text-sm text-gray-800">{addresses[index]?.phoneNumber}</h1>
-            <button onClick={() => setChangeAddress(true)} className="text-blue-500 text-sm mt-2">Change</button>
-          </div>
+          addresses.length >= 1 ? (
+            <div className="mb-6 border-b pb-4">
+              <h2 className="text-lg font-semibold">Delivering to {addresses[index]?.user_id?.username}</h2>
+              <p className="text-sm text-gray-600">{addresses[index]?.city}, {addresses[index]?.street}, {addresses[index]?.state}, {addresses[index]?.pinCode}, {addresses[index]?.country}</p>
+              <h1 className="text-sm text-gray-800">{addresses[index]?.phoneNumber}</h1>
+              <button onClick={() => setChangeAddress(true)} className="text-blue-500 text-sm mt-2">Change</button>
+            </div>
+          ) : (
+            <p>Please add a Deliver <span onClick={() => {
+              if (addresses.length < 1) {
+                navigate(`/address/${userId}`)
+              }
+              setChangeAddress(true);
+
+            }} className="text-red-500 underline cursor-pointer hover:text-blue-600">address🏠</span></p>
+          )
         )
         }
 
