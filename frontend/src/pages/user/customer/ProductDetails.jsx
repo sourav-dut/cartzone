@@ -12,19 +12,15 @@ export default function ProductDetails() {
   const navigate = useNavigate();
   const { data: product, isLoading, error, refetch } = useGetProductByIdQuery(productId);
   const [createCart, { isLoading: cartIsLoading }] = useCreateCartMutation();
-
   const [selectedImage, setSelectedImage] = useState("");
   const [productDiscount, setProductDiscount] = useState(0);
-
   useEffect(() => {
     if (product) {
       const discountAmount = Math.floor(product.price * product.discountPercentage / 100);
       setProductDiscount(discountAmount);
     }
   }, [product]);
-
   const discountedPrice = product ? Math.floor(product.price - productDiscount) : 0;
-
   useEffect(() => {
     if (product?.images?.length) {
       setSelectedImage(product.images[0]);
@@ -35,13 +31,13 @@ export default function ProductDetails() {
 
   const handleCart = async () => {
     if (!userId) {
-      toast.error("Please log in to add items to the cart!");
+      toast.error("Please log in to add items to the cart !!");
       navigate("/login");
       return;
     }
     try {
       await createCart({ product_id: productId, quantity: 1, discountPrice: discountedPrice || product.price }).unwrap();
-      toast.success("Added to cart successfully");
+      toast.success("Added to cart successfully !!");
 
       let discountData = JSON.parse(localStorage.getItem("productDiscount")) || [];
       discountData.push({ productId: productId, productDiscount: productDiscount });
