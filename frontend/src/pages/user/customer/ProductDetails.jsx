@@ -46,7 +46,7 @@ export default function ProductDetails() {
       navigate(`/cart/${userId}`);
       refetch();
     } catch {
-      toast.error("Something went wrong!");
+      toast.error("Something went wrong!!!");
     }
   };
 
