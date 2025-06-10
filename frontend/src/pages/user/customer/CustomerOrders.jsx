@@ -18,7 +18,7 @@ const CustomerOrders = () => {
       await cancelOrder(orderId).unwrap();
       refetch();
     } catch (error) {
-      alert("Failed to cancel order. Please try again.");
+      alert("Failed to cancel order. Please try again !!.");
     }
   };
 
