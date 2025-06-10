@@ -36,7 +36,7 @@ export default function ProductDetails() {
   const handleCart = async () => {
     if (!userId) {
       toast.error("Please log in to add items to the cart!");
-      navigate("/home");
+      navigate("/login");
       return;
     }
     try {
